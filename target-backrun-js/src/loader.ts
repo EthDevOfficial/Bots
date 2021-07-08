@@ -1,9 +1,12 @@
 import Web3 from 'web3'
 import PolygonLoader from './loading/polygon'
 import abiDecoder from 'abi-decoder'
-import { Chain, Exchange, ForkType, Router, Token } from './types'
+import { Chain, Exchange, Router } from './types'
 import FantomLoader from './loading/fantom'
 import XDaiLoader from './loading/xdai'
+import { makeAddressKey } from './general'
+import Token from './token'
+import { bidSimpleNoChi, bidSimpleChi, bidTriNoChi, bidTriChi } from './bundleBidder'
 const path = require('path')
 const abis = require('./abis')
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
@@ -31,7 +34,7 @@ function load() {
 
 	const routerExchangeMap = exchanges
 		.map((exchange) => {
-			return { key: exchange.router.address.toLowerCase(), val: exchange }
+			return { key: exchange.router.address, val: exchange }
 		})
 		.reduce((map, obj) => {
 			map[obj.key] = obj.val
@@ -40,7 +43,7 @@ function load() {
 
 	const routerForkTypeMap = routers
 		.map((router) => {
-			return { key: router.address.toLowerCase(), val: router.forkType }
+			return { key: router.address, val: router.forkType }
 		})
 		.reduce((map, obj) => {
 			map[obj.key] = obj.val
@@ -49,7 +52,7 @@ function load() {
 
 	const tokenMap = tokens
 		.map((token) => {
-			return { key: token.address.toLowerCase(), val: token }
+			return { key: makeAddressKey(token.address), val: token }
 		})
 		.reduce((map, obj) => {
 			map[obj.key] = obj.val
@@ -58,7 +61,6 @@ function load() {
 
 	abiDecoder.addABI(abis.uniswapRouter)
 	abiDecoder.addABI(abis.paraswapRouter)
-
 	abiDecoder.addABI(abis.optimizerExec.abi)
 
 	return {
@@ -71,10 +73,12 @@ function load() {
 		routerExchangeMap,
 		routerForkTypeMap,
 		tokenMap,
-		preferedTokens: preferedTokenObjs.map((token) => token.address.toLowerCase()),
-		ignoreTokens: ignoreTokenCased.map((address) => address.toLowerCase()),
+		preferedTokens: preferedTokenObjs.map((token) => token.key),
+		ignoreTokens: ignoreTokenCased.map((address) => makeAddressKey(address)),
 		hotAddress: '0x6ebaA58e9C60A4E6d2ebEcb2d55b119eC1DE8D42',
 		hotPrivateKey: '8cf317cf854ba12a9283f41b4c8dd214d60deaac35888121a046b002beb0b0be',
+		bidSimple: chain === Chain.XDai ? bidSimpleNoChi : bidSimpleChi,
+		bidTri: chain === Chain.XDai ? bidTriNoChi : bidTriChi,
 		...loader,
 	}
 }

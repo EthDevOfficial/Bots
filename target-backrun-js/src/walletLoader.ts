@@ -17,7 +17,7 @@ class WalletLoader {
 		this.hotPrivateKey = hotPrivateKey
 	}
 
-	async loadWallets() {
+	async loadWallets(): Promise<Wallet[]> {
 		// See if we need to generate new wallets
 		if (GEN_NEW_WALLETS) {
 			try {
@@ -44,12 +44,16 @@ class WalletLoader {
 		}
 
 		// Read all the wallets from the file and return them
-		return readJsonSync(WALLETS_PATH!).map((wallet) => {
-			return {
-				...wallet,
-				account: this.web3.eth.accounts.wallet.add(wallet.account.privateKey),
-			}
-		})
+		return await Promise.all(
+			readJsonSync(WALLETS_PATH!).map(async (wallet) => {
+				const account = this.web3.eth.accounts.wallet.add(wallet.account.privateKey)
+				return {
+					...wallet,
+					account,
+					nonce: await this.web3.eth.getTransactionCount(account.address),
+				} as Wallet
+			})
+		)
 	}
 
 	private async pullFromWallets(prevWallets: Wallet[]) {
@@ -107,6 +111,7 @@ class WalletLoader {
 				this.wallets.push({
 					account: this.web3.eth.accounts.wallet.add(wallet.privateKey),
 					id: i,
+					nonce: 0,
 				})
 
 				console.log(`[${i}] ${wallet.address} LOADED with BALANCE ${WALLET_BALANCE}`)
@@ -122,6 +127,7 @@ class WalletLoader {
 					this.wallets.push({
 						account: this.web3.eth.accounts.wallet.add(wallet.privateKey),
 						id: i,
+						nonce: 0,
 					})
 
 					console.log(`[${i}] ${wallet.address} LOADED with BALANCE ${WALLET_BALANCE}`)

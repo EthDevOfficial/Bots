@@ -8,8 +8,9 @@ export enum Chain {
 }
 
 export enum ForkType {
-	Uniswap = 0,
-	Paraswap = 1,
+	Default = 0,
+	Uniswap = 1,
+	Paraswap = 2,
 }
 
 export enum ArbType {
@@ -31,33 +32,29 @@ export type Exchange = {
 	swapFee: number
 }
 
-export type Token = {
-	id: ID
-	address: Address
-	decimals: number
-}
-
-export type Pool = {
-	token1: Token
-	token2: Token
-	exchange: Exchange
-	swapped?: boolean
-	gasPrice?: BigNumber
-	isParaswap?: boolean
-}
-
-export type Route = {
-	type: ArbType
-	poolRoute: Pool[]
-}
-
 export type RouteBundle = {
 	type: ArbType
 	routes: Route[]
-	encodedRoutes?: any
+	gasPrice: BigNumber
+	encodedRoutes: any
 }
 
 export type Wallet = {
 	account: any
 	id: number
+	nonce: number
+}
+
+export type Route = {
+	type: ArbType
+	pools: Pool[]
+}
+
+export type Pool = {
+	token1: Address
+	t1Key: string
+	token2: Address
+	t2Key: string
+	exchange: Exchange
+	gasPrice?: BigNumber
 }

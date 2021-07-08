@@ -1,14 +1,10 @@
-import { Chain } from './types'
+import { Address, Chain } from './types'
 import { LOG_LENGTH } from './constants'
 
-import { chain } from './main'
+import { chain, hotAddress } from './main'
 
 export function exists(obj: any) {
 	return obj ? true : false
-}
-
-export async function sleep(msec) {
-	return new Promise((resolve) => setTimeout(resolve, msec))
 }
 
 export function timestamp() {
@@ -78,4 +74,8 @@ export function makeRow(left: string, right: string, padString = '=') {
 
 export function makeGFRow(left: string, right: string, padString = '=') {
 	return left + right.padStart(SHORTER_LENGTH - left.length, padString)
+}
+
+export function makeAddressKey(address: Address) {
+	return address.toLowerCase()
 }

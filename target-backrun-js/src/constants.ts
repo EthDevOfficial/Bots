@@ -20,12 +20,14 @@ export const ONE_GWEI_BN = new BigNumber('1000000000')
 // Bidding
 export const REDUNDANCY = process.env.REDUNDANCY ? Number(process.env.REDUNDANCY) : 1
 export const MAX_GAS_PRICE = new BigNumber(process.env.MAX_GAS_PRICE ? process.env.MAX_GAS_PRICE : '100').multipliedBy(ONE_GWEI_BN)
-export const SIMPLE_GAS_ESTIMATE = new BigNumber(process.env.SIMPLE_GAS_ESTIMATE ? process.env.SIMPLE_GAS_ESTIMATE : '100000')
-export const TRI_GAS_ESTIMATE = new BigNumber(process.env.TRI_GAS_ESTIMATE ? process.env.TRI_GAS_ESTIMATE : '300000')
-export const MIN_GAS_LIMIT = new BigNumber(600000)
+export const SIMPLE_GAS_ESTIMATE = new BigNumber(process.env.SIMPLE_GAS_ESTIMATE ? process.env.SIMPLE_GAS_ESTIMATE : '150000')
+export const TRI_GAS_ESTIMATE = new BigNumber(process.env.TRI_GAS_ESTIMATE ? process.env.TRI_GAS_ESTIMATE : '200000')
+export const MIN_GAS_LIMIT = new BigNumber(320000)
 export const OPP_EXEC_CONTRACT = process.env.OPP_EXEC_CONTRACT ? process.env.OPP_EXEC_CONTRACT : 'ADD CONTRACT TO ENV'
+export const CHI_GAS_CUT_OFF = new BigNumber(5000000000)
 
 // Logging
+export const LOG_ARBS = false
 export const LOG_LENGTH = 40
 export const LOG_BOUNDER = '='.repeat(LOG_LENGTH - 2)
 export const ERROR_BOUNDER = '!'.repeat(LOG_LENGTH * 2)
@@ -39,8 +41,7 @@ export const SimpleBackrun = {
 		innerToken: 'address',
 		exchange1: 'address',
 		exchange2: 'address',
-		swapFee1: 'uint256',
-		swapFee2: 'uint256',
+		swapFeeSum: 'uint256',
 	},
 }
 
@@ -52,8 +53,6 @@ export const TriBackrun = {
 		exchange1: 'address',
 		exchange2: 'address',
 		exchange3: 'address',
-		swapFee1: 'uint256',
-		swapFee2: 'uint256',
-		swapFee3: 'uint256',
+		swapFeeSum: 'uint256',
 	},
 }
