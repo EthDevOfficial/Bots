@@ -1,0 +1,15 @@
+{
+  "name": "target-backrunner-rust",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "cargo run",
+    "format": "cargo fmt",
+    "build-copy-push": "npm run pull-deployment-repo && npm run remove-old && npm run copy && npm run push",
+    "pull-deployment-repo": "cd ../../target-backrunner-rust-deployment && git pull",
+    "remove-old": "rm -r ../../target-backrunner-rust-deployment/deploy && mkdir ../../target-backrunner-rust-deployment/deploy",
+    "copy": "cp -a src/. ../../target-backrunner-rust-deployment/deploy/src && cp -a abis/. ../../target-backrunner-rust-deployment/deploy/abis && cp Dockerfile ../../target-backrunner-rust-deployment/deploy && cp Cargo.toml ../../target-backrunner-rust-deployment/deploy && cp Cargo.lock ../../target-backrunner-rust-deployment/deploy",
+    "push": "cd ../../target-backrunner-rust-deployment && git add . && git commit -m \"build-copy-push\" && git push origin"
+  },
+  "author": "EthDev Technologies",
+  "license": "ISC"
+}
