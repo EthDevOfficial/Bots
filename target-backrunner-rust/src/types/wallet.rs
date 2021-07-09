@@ -72,13 +72,10 @@ impl Wallet {
         };
 
         let tx_object = {
-            let nonce = if get_nonce_from_chain {
-                Some(Wallet::get_nonce_from_chain(&self.public_key, &immutable_state).await)
-            }
-            else
-            {
-                Some(Wallet::get_nonce(self))
-            };
+            let nonce = 
+                Some(Wallet::get_nonce_from_chain(&self.public_key, &immutable_state).await);
+            
+            println!("on Chain nonce: {:?}", Wallet::get_nonce_from_chain(&self.public_key, &immutable_state).await);
 
             match optional_amount {
                 Some(amount) => println!("Sent from wallet with nonce: {:?} to: {:?}", nonce.unwrap(), to.public_key),
@@ -95,8 +92,6 @@ impl Wallet {
             }
         };
 
-        self.increment_nonce();
-
         // Sign the tx (can be done offline)
         let signed = immutable_state
             .web3
@@ -111,6 +106,9 @@ impl Wallet {
             .eth()
             .send_raw_transaction(signed.raw_transaction)
             .await;
+        
+
+            println!("Transaction Hash: {:?}", result);
 
         Ok(())
     }

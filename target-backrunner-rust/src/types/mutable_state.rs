@@ -27,7 +27,7 @@ impl MutableState {
             .unwrap();
 
         let wallet_balance: U256 = env::var("WALLET_BALANCE")
-            .unwrap_or("10".to_string())
+            .unwrap_or("1".to_string())
             .parse()
             .unwrap();
 
@@ -75,6 +75,10 @@ impl MutableState {
                 None => (),
             };
 
+            // let ten_sec = std::time::Duration::from_secs(30);
+            // println!("Waiting {:?} for wallet cooldown", ten_sec);
+            // std::thread::sleep(ten_sec);
+
             // Create, send balance, and save wallets
             for i in 0..num_wallets {
                 let wallet = Wallet::create_new();
@@ -96,7 +100,7 @@ impl MutableState {
                             }
                             Err(err) => println!("failed wallet send: {:?}", err),
                         }
-                        let ten_millis = std::time::Duration::from_millis(4000);
+                        let ten_millis = std::time::Duration::from_millis(6000);
 
                         std::thread::sleep(ten_millis);
                     }
@@ -104,6 +108,10 @@ impl MutableState {
                 }
             }
         }
+
+        let ten_sec = std::time::Duration::from_secs(20);
+        println!("Waiting {:?} for wallet cooldown", ten_sec);
+        std::thread::sleep(ten_sec);
 
         let loaded_wallets_pk = read_private_keys_from_file(&wallet_path).unwrap();
         let mut loaded_wallets: Vec<Wallet> = Vec::new();

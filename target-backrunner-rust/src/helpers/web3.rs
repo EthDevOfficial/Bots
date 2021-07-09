@@ -45,7 +45,7 @@ pub fn make_tri_tx(
     gas_price: U256,
 ) -> (TransactionParameters, usize) {
     let wallet_index = mutable_state.increment_wallet_index();
-
+    println!("GP: {:?}", gas_price);
     (
         TransactionParameters {
             to: Some(immutable_state.contract),
@@ -84,7 +84,7 @@ pub async fn send_transaction(
     match result {
         Ok(response) => {
             // looks like this response may need decode to be readable
-            println!("{}", response);
+            println!("{:?}", response);
             mutable_state.wallets[wallet_index].increment_nonce();
         }
         Err(error) => {
