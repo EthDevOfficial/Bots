@@ -95,7 +95,7 @@ impl Wallet {
             }
         };
 
-        if !get_nonce_from_chain {self.increment_nonce();}
+        self.increment_nonce();
 
         // Sign the tx (can be done offline)
         let signed = immutable_state

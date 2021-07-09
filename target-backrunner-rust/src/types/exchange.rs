@@ -13,6 +13,8 @@ pub struct Exchange {
 }
 impl Exchange {
     pub fn new(router: &str, swap_fee: u32, router_type: &Router) -> Exchange {
+        let this_file = file!();
+        println!("defined in file: {}", this_file);
         let file_path = env::var("ABI_PATH").unwrap_or("./abis/uniswapRouter.json".to_string());
         let abi = match router_type {
             Uniswap => abi::open(&file_path),

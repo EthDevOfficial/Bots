@@ -93,9 +93,9 @@ pub async fn send_transaction(
                 Error::Rpc(error) => {
                     let error = error;
                     if error.message
-                        == "Transaction nonce is too low. Try incrementing the nonce.".to_string()
+                        == "insufficient funds for gas * price + value".to_string()
                     {
-                        println!("Bagged it");
+                        mutable_state.hot_wallet.send_to_wallet(immutable_state.clone(), Some(10.into()), &mutable_state.wallets[wallet_index], 51.into(), true).await;
                     }
                 }
                 _ => (),

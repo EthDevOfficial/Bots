@@ -22,7 +22,7 @@ impl MutableState {
             .eq("true");
 
         let num_wallets: usize = env::var("NUM_WALLETS")
-            .unwrap_or("1".to_string())
+            .unwrap_or("10".to_string())
             .parse()
             .unwrap();
 
