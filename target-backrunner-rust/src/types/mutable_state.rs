@@ -27,11 +27,11 @@ impl MutableState {
             .parse()
             .unwrap();
 
-        let wallet_balance: U256 = U256::from_dec_str(&env::var("WALLET_BALANCE")
-            .unwrap_or("100".to_string())).unwrap();
+        let wallet_balance: U256 =
+            U256::from_dec_str(&env::var("WALLET_BALANCE").unwrap_or("100".to_string())).unwrap();
 
-        let wl_gas_price: U256 = U256::from_dec_str(&env::var("WL_GAS_PRICE")
-        .unwrap_or("50".to_string())).unwrap();
+        let wl_gas_price: U256 =
+            U256::from_dec_str(&env::var("WL_GAS_PRICE").unwrap_or("50".to_string())).unwrap();
 
         let hot_wallet = Wallet::load_from_pk(
             "593b7e767faafbe9d60488cc01dc748ee83ce3aef4a8c5cbff80ee94bb5ec7bf".to_string(),
