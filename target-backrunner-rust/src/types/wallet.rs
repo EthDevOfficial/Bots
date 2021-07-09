@@ -54,6 +54,7 @@ impl Wallet {
         gas_price: U256,
         get_nonce_from_chain: bool,
     ) -> Web3Result {
+        println!("before saturation {:?}", optional_amount);
         let gas_price = U256::exp10(9).saturating_mul(gas_price);
         let gas_limit: U256 = 21_000.into();
 
@@ -70,6 +71,7 @@ impl Wallet {
                 wallet_balance_wei.saturating_sub(gas_price.saturating_mul(gas_limit))
             }
         };
+        println!("after saturation {:?}", amount);
 
         let tx_object = {
             let nonce =
