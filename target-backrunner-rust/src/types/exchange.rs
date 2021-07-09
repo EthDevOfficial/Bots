@@ -2,6 +2,7 @@ use super::enums::Router;
 use crate::helpers::abi;
 use ethereum_abi::Abi;
 use std::str::FromStr;
+use std::{env, sync::Arc};
 use web3::types::H160;
 
 pub struct Exchange {
@@ -12,8 +13,10 @@ pub struct Exchange {
 }
 impl Exchange {
     pub fn new(router: &str, swap_fee: u32, router_type: &Router) -> Exchange {
+        let this_file = file!();
+        let file_path = env::var("ABI_PATH").unwrap_or("./abis/uniswapRouter.json".to_string());
         let abi = match router_type {
-            Uniswap => abi::open("./abis/uniswapRouter.json"),
+            Uniswap => abi::open(&file_path),
         };
 
         Exchange {

@@ -6,7 +6,9 @@ pub fn open(file: &str) -> Abi {
     Abi::from_reader(file).expect("failed to parse ABI")
 }
 
-pub fn decode<'a>(encoded_param: &Vec<u8>, abi: &'a Abi) -> (&'a Function, DecodedParams) {
-    abi.decode_input_from_slice(encoded_param)
-        .expect("failed decoding input")
+pub fn decode<'a>(encoded_param: &Vec<u8>, abi: &'a Abi) -> Option<(&'a Function, DecodedParams)> {
+    match abi.decode_input_from_slice(encoded_param) {
+        Ok(abi) => Some(abi),
+        _ => None,
+    }
 }

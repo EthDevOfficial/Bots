@@ -6,7 +6,12 @@ use ethabi::{ethereum_types::U256, Bytes};
 use ethabi_contract::use_contract;
 use ethabi_derive;
 use std::sync::Arc;
-use web3::{Error, Result, Web3, signing, transports::WebSocket, types::{TransactionParameters, H160}};
+use web3::{
+    signing,
+    transports::WebSocket,
+    types::{TransactionParameters, H160},
+    Error, Result, Web3,
+};
 
 use_contract!(optimizer, "./abis/optimizerExec.json");
 use optimizer::functions;
@@ -40,7 +45,6 @@ pub fn make_tri_tx(
     gas_price: U256,
 ) -> (TransactionParameters, usize) {
     let wallet_index = mutable_state.increment_wallet_index();
-
     (
         TransactionParameters {
             to: Some(immutable_state.contract),
@@ -79,7 +83,6 @@ pub async fn send_transaction(
     match result {
         Ok(response) => {
             // looks like this response may need decode to be readable
-            println!("{}", response);
             mutable_state.wallets[wallet_index].increment_nonce();
         }
         Err(error) => {
@@ -87,11 +90,20 @@ pub async fn send_transaction(
             match error {
                 Error::Rpc(error) => {
                     let error = error;
-                    if error.message ==  "Transaction nonce is too low. Try incrementing the nonce.".to_string() {
-                        println!("Bagged it");
+                    if error.message.contains("funds") {
+                        mutable_state
+                            .hot_wallet
+                            .send_to_wallet(
+                                immutable_state.clone(),
+                                Some(mutable_state.wallet_balance),
+                                &mutable_state.wallets[wallet_index],
+                                51.into(),
+                                true,
+                            )
+                            .await;
                     }
-                },
-                _ => ()
+                }
+                _ => (),
             };
         }
     };

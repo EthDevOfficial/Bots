@@ -5,10 +5,10 @@ use crate::types::{
 };
 use ethabi::ethereum_types::U256;
 use ethabi::{Bytes, Token as Tokenized};
+use std::cmp::min;
 use std::sync::Arc;
 use std::vec::Vec;
 use web3::types::H160;
-use std::cmp::min;
 
 pub async fn make_simple_routes(
     token1: &H160,
@@ -73,7 +73,7 @@ pub async fn make_simple_routes(
 
     let bundle_size = immutable_state.bundle_size;
     while routes.len() > 0 {
-        let bundle: Vec<Bytes> = routes.drain(0..min(bundle_size,routes.len())).collect();
+        let bundle: Vec<Bytes> = routes.drain(0..min(bundle_size, routes.len())).collect();
         let (tx_obj, wallet_index) = make_simple_tx(
             immutable_state.clone(),
             bundle,
@@ -115,7 +115,9 @@ pub async fn make_tri_routes(
 
     let bundle_size = immutable_state.bundle_size;
     while outer_routes.len() > 0 {
-        let bundle: Vec<Bytes> = outer_routes.drain(0..min(bundle_size,outer_routes.len())).collect();
+        let bundle: Vec<Bytes> = outer_routes
+            .drain(0..min(bundle_size, outer_routes.len()))
+            .collect();
         let (tx_obj, wallet_index) = make_tri_tx(
             immutable_state.clone(),
             bundle,

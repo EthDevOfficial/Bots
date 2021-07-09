@@ -11,6 +11,8 @@ use web3::types::{Address, U256};
 pub struct MutableState {
     pub wallets: Vec<Wallet>,
     pub wallet_index: Mutex<usize>,
+    pub hot_wallet: Wallet,
+    pub wallet_balance: U256,
 }
 impl MutableState {
     pub async fn new(immutable_state: Arc<ImmutableState>) -> Arc<Self> {
@@ -21,21 +23,15 @@ impl MutableState {
             .eq("true");
 
         let num_wallets: usize = env::var("NUM_WALLETS")
-            .unwrap_or("20".to_string())
-            .parse()
-            .unwrap();
-
-        let wallet_balance: U256 = env::var("WALLET_BALANCE")
             .unwrap_or("10".to_string())
             .parse()
             .unwrap();
 
-        let wl_gas_price: u64 = env::var("WL_GAS_PRICE")
-            .unwrap_or("21".to_string())
-            .parse()
-            .unwrap();
+        let wallet_balance: U256 =
+            U256::from_dec_str(&env::var("WALLET_BALANCE").unwrap_or("100".to_string())).unwrap();
 
-        let wl_gas_price: U256 = wl_gas_price.into();
+        let wl_gas_price: U256 =
+            U256::from_dec_str(&env::var("WL_GAS_PRICE").unwrap_or("50".to_string())).unwrap();
 
         let hot_wallet = Wallet::load_from_pk(
             "593b7e767faafbe9d60488cc01dc748ee83ce3aef4a8c5cbff80ee94bb5ec7bf".to_string(),
@@ -62,6 +58,7 @@ impl MutableState {
                                 None,
                                 &hot_wallet,
                                 wl_gas_price,
+                                false,
                             )
                             .await;
                         match pull_result {
@@ -72,6 +69,10 @@ impl MutableState {
                 }
                 None => (),
             };
+
+            // let ten_sec = std::time::Duration::from_secs(30);
+            // println!("Waiting {:?} for wallet cooldown", ten_sec);
+            // std::thread::sleep(ten_sec);
 
             // Create, send balance, and save wallets
             for i in 0..num_wallets {
@@ -84,6 +85,7 @@ impl MutableState {
                                 Some(wallet_balance),
                                 &wallet,
                                 wl_gas_price,
+                                false,
                             )
                             .await;
                         match send_result {
@@ -93,7 +95,7 @@ impl MutableState {
                             }
                             Err(err) => println!("failed wallet send: {:?}", err),
                         }
-                        let ten_millis = std::time::Duration::from_millis(1000);
+                        let ten_millis = std::time::Duration::from_millis(6000);
 
                         std::thread::sleep(ten_millis);
                     }
@@ -101,6 +103,10 @@ impl MutableState {
                 }
             }
         }
+
+        let ten_sec = std::time::Duration::from_secs(20);
+        println!("Waiting {:?} for wallet cooldown", ten_sec);
+        std::thread::sleep(ten_sec);
 
         let loaded_wallets_pk = read_private_keys_from_file(&wallet_path).unwrap();
         let mut loaded_wallets: Vec<Wallet> = Vec::new();
@@ -113,6 +119,8 @@ impl MutableState {
         Arc::new(MutableState {
             wallets: loaded_wallets,
             wallet_index: Mutex::new(0),
+            hot_wallet,
+            wallet_balance,
         })
     }
 
@@ -121,8 +129,7 @@ impl MutableState {
         if *wallet_index + 1 == self.wallets.len() {
             *wallet_index = 0;
             wallet_index.clone()
-        }
-        else {
+        } else {
             *wallet_index += 1;
             wallet_index.clone()
         }

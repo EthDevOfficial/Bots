@@ -48,9 +48,6 @@ async fn process_token_path(
                                     )
                                     .await;
                                 }
-                                println!("=====================================================");
-                                println!("We found a changed pool!! ({},{})", token1, token2);
-                                println!("=====================================================");
                             }
                         }
                         _ => {}
