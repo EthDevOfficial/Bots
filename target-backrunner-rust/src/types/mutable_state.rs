@@ -11,6 +11,7 @@ use web3::types::{Address, U256};
 pub struct MutableState {
     pub wallets: Vec<Wallet>,
     pub wallet_index: Mutex<usize>,
+    pub hot_wallet: Wallet
 }
 impl MutableState {
     pub async fn new(immutable_state: Arc<ImmutableState>) -> Arc<Self> {
@@ -21,7 +22,7 @@ impl MutableState {
             .eq("true");
 
         let num_wallets: usize = env::var("NUM_WALLETS")
-            .unwrap_or("20".to_string())
+            .unwrap_or("1".to_string())
             .parse()
             .unwrap();
 
@@ -31,7 +32,7 @@ impl MutableState {
             .unwrap();
 
         let wl_gas_price: u64 = env::var("WL_GAS_PRICE")
-            .unwrap_or("21".to_string())
+            .unwrap_or("51".to_string())
             .parse()
             .unwrap();
 
@@ -62,6 +63,7 @@ impl MutableState {
                                 None,
                                 &hot_wallet,
                                 wl_gas_price,
+                                false
                             )
                             .await;
                         match pull_result {
@@ -84,6 +86,7 @@ impl MutableState {
                                 Some(wallet_balance),
                                 &wallet,
                                 wl_gas_price,
+                                false
                             )
                             .await;
                         match send_result {
@@ -93,7 +96,7 @@ impl MutableState {
                             }
                             Err(err) => println!("failed wallet send: {:?}", err),
                         }
-                        let ten_millis = std::time::Duration::from_millis(1000);
+                        let ten_millis = std::time::Duration::from_millis(4000);
 
                         std::thread::sleep(ten_millis);
                     }
@@ -113,6 +116,7 @@ impl MutableState {
         Arc::new(MutableState {
             wallets: loaded_wallets,
             wallet_index: Mutex::new(0),
+            hot_wallet,
         })
     }
 
@@ -121,8 +125,7 @@ impl MutableState {
         if *wallet_index + 1 == self.wallets.len() {
             *wallet_index = 0;
             wallet_index.clone()
-        }
-        else {
+        } else {
             *wallet_index += 1;
             wallet_index.clone()
         }

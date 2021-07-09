@@ -34,13 +34,13 @@ impl ImmutableState {
         ignore_addresses: Vec<&str>,
     ) -> Self {
         // Web3
-        let ws_url = env::var("WS_URL").unwrap_or("ws://3.239.13.11:8546".to_string());
+        let ws_url = env::var("WS_URL").unwrap_or("ws://35.168.113.135:8546".to_string());
         let web3 = connect_to_node(&ws_url).await.unwrap();
 
         // Contracts
         let contract = H160::from_str(
             &env::var("CONTRACT")
-                .unwrap_or("0xF2A62C4A4f5f7736b79D9682c34EAFb057B140D9".to_string()),
+                .unwrap_or("0x6E8a22e28A92f47CE1CE76a26dE691802A25ca85".to_string()),
         )
         .unwrap();
 

@@ -1,6 +1,7 @@
 use crate::helpers::{abi::decode, changed_pool::process_router_params};
 use crate::types::immutable_state::ImmutableState;
 use crate::types::mutable_state::MutableState;
+use std::option;
 use std::sync::Arc;
 use web3::{
     types::{Bytes, Transaction, TransactionId, H256},
@@ -21,17 +22,22 @@ async fn process_transaction(
             match optional_exchange_index {
                 Some(exchange_index) => match &transaction.input {
                     Bytes(encoded_tx) => {
-                        let (func, params) =
+                        let option_abi =
                             decode(encoded_tx, &immutable_state.exchanges[exchange_index].abi);
-                        process_router_params(
-                            func,
-                            params,
-                            transaction.gas_price,
-                            exchange_index,
-                            immutable_state.clone(),
-                            mutable_state,
-                        )
-                        .await;
+                        match option_abi {
+                            Some((func, params)) => {
+                                process_router_params(
+                                    func,
+                                    params,
+                                    transaction.gas_price,
+                                    exchange_index,
+                                    immutable_state.clone(),
+                                    mutable_state,
+                                )
+                                .await
+                            }
+                            None => (),
+                        }
                     }
                 },
                 None => {}

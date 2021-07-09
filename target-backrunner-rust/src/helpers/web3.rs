@@ -6,7 +6,12 @@ use ethabi::{ethereum_types::U256, Bytes};
 use ethabi_contract::use_contract;
 use ethabi_derive;
 use std::sync::Arc;
-use web3::{Error, Result, Web3, signing, transports::WebSocket, types::{TransactionParameters, H160}};
+use web3::{
+    signing,
+    transports::WebSocket,
+    types::{TransactionParameters, H160},
+    Error, Result, Web3,
+};
 
 use_contract!(optimizer, "./abis/optimizerExec.json");
 use optimizer::functions;
@@ -87,11 +92,13 @@ pub async fn send_transaction(
             match error {
                 Error::Rpc(error) => {
                     let error = error;
-                    if error.message ==  "Transaction nonce is too low. Try incrementing the nonce.".to_string() {
+                    if error.message
+                        == "Transaction nonce is too low. Try incrementing the nonce.".to_string()
+                    {
                         println!("Bagged it");
                     }
-                },
-                _ => ()
+                }
+                _ => (),
             };
         }
     };

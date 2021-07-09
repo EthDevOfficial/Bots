@@ -52,6 +52,7 @@ impl Wallet {
         optional_amount: Option<U256>,
         to: &Wallet,
         gas_price: U256,
+        get_nonce_from_chain: bool
     ) -> Web3Result {
         let gas_price = U256::exp10(9).saturating_mul(gas_price);
         let gas_limit: U256 = 21_000.into();
@@ -71,9 +72,16 @@ impl Wallet {
         };
 
         let tx_object = {
-            let nonce = Some(*self.nonce.lock().unwrap());
+            let nonce = if get_nonce_from_chain {
+                Some(Wallet::get_nonce_from_chain(&self.public_key, &immutable_state).await)
+            }
+            else
+            {
+                Some(Wallet::get_nonce(self))
+            };
+
             match optional_amount {
-                Some(amount) => println!("Sent from wallet with nonce: {:?}", nonce.unwrap()),
+                Some(amount) => println!("Sent from wallet with nonce: {:?} to: {:?}", nonce.unwrap(), to.public_key),
                 None => println!("Pulled from wallet with nonce: {:?}", nonce.unwrap()),
             }
 
@@ -87,7 +95,7 @@ impl Wallet {
             }
         };
 
-        self.increment_nonce();
+        if !get_nonce_from_chain {self.increment_nonce();}
 
         // Sign the tx (can be done offline)
         let signed = immutable_state
