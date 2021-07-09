@@ -102,8 +102,7 @@ impl Wallet {
             .web3
             .eth()
             .send_raw_transaction(signed.raw_transaction)
-            .await
-            .unwrap();
+            .await;
 
         Ok(())
     }

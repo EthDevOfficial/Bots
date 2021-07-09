@@ -16,13 +16,13 @@ pub fn tokenize_simple(
     ex2: &H160,
     swap_fee_sum: U256,
 ) -> Bytes {
-    encode(&[Array(vec![
+    encode(&[
         Address(token1.clone()),
         Address(token2.clone()),
         Address(ex1.clone()),
         Address(ex2.clone()),
         Uint(swap_fee_sum),
-    ])])
+    ])
 }
 
 pub fn tokenize_tri(
@@ -34,7 +34,7 @@ pub fn tokenize_tri(
     ex3: &H160,
     swap_fee_sum: U256,
 ) -> Bytes {
-    encode(&[Array(vec![
+    encode(&[
         Address(token1.clone()),
         Address(token2.clone()),
         Address(token3.clone()),
@@ -42,5 +42,5 @@ pub fn tokenize_tri(
         Address(ex2.clone()),
         Address(ex3.clone()),
         Uint(swap_fee_sum),
-    ])])
+    ])
 }
