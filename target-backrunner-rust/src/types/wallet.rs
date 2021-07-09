@@ -54,7 +54,6 @@ impl Wallet {
         gas_price: U256,
         get_nonce_from_chain: bool,
     ) -> Web3Result {
-        println!("before saturation {:?}", optional_amount);
         let gas_price = U256::exp10(9).saturating_mul(gas_price);
         let gas_limit: U256 = 21_000.into();
 
@@ -71,16 +70,10 @@ impl Wallet {
                 wallet_balance_wei.saturating_sub(gas_price.saturating_mul(gas_limit))
             }
         };
-        println!("after saturation {:?}", amount);
 
         let tx_object = {
             let nonce =
                 Some(Wallet::get_nonce_from_chain(&self.public_key, &immutable_state).await);
-
-            println!(
-                "on Chain nonce: {:?}",
-                Wallet::get_nonce_from_chain(&self.public_key, &immutable_state).await
-            );
 
             match optional_amount {
                 Some(amount) => println!(
@@ -88,7 +81,7 @@ impl Wallet {
                     nonce.unwrap(),
                     to.public_key
                 ),
-                None => println!("Pulled from wallet with nonce: {:?}", nonce.unwrap()),
+                None => (),
             }
 
             TransactionParameters {
