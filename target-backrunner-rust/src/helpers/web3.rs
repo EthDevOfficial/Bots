@@ -92,10 +92,17 @@ pub async fn send_transaction(
             match error {
                 Error::Rpc(error) => {
                     let error = error;
-                    if error.message
-                        == "insufficient funds for gas * price + value".to_string()
-                    {
-                        mutable_state.hot_wallet.send_to_wallet(immutable_state.clone(), Some(10.into()), &mutable_state.wallets[wallet_index], 51.into(), true).await;
+                    if error.message == "insufficient funds for gas * price + value".to_string() {
+                        mutable_state
+                            .hot_wallet
+                            .send_to_wallet(
+                                immutable_state.clone(),
+                                Some(mutable_state.wallet_balance),
+                                &mutable_state.wallets[wallet_index],
+                                51.into(),
+                                true,
+                            )
+                            .await;
                     }
                 }
                 _ => (),

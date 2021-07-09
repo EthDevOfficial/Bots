@@ -2,8 +2,8 @@ use super::enums::Router;
 use crate::helpers::abi;
 use ethereum_abi::Abi;
 use std::str::FromStr;
-use web3::types::H160;
 use std::{env, sync::Arc};
+use web3::types::H160;
 
 pub struct Exchange {
     pub router: H160,

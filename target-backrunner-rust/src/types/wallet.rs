@@ -52,7 +52,7 @@ impl Wallet {
         optional_amount: Option<U256>,
         to: &Wallet,
         gas_price: U256,
-        get_nonce_from_chain: bool
+        get_nonce_from_chain: bool,
     ) -> Web3Result {
         let gas_price = U256::exp10(9).saturating_mul(gas_price);
         let gas_limit: U256 = 21_000.into();
@@ -72,13 +72,20 @@ impl Wallet {
         };
 
         let tx_object = {
-            let nonce = 
+            let nonce =
                 Some(Wallet::get_nonce_from_chain(&self.public_key, &immutable_state).await);
-            
-            println!("on Chain nonce: {:?}", Wallet::get_nonce_from_chain(&self.public_key, &immutable_state).await);
+
+            println!(
+                "on Chain nonce: {:?}",
+                Wallet::get_nonce_from_chain(&self.public_key, &immutable_state).await
+            );
 
             match optional_amount {
-                Some(amount) => println!("Sent from wallet with nonce: {:?} to: {:?}", nonce.unwrap(), to.public_key),
+                Some(amount) => println!(
+                    "Sent from wallet with nonce: {:?} to: {:?}",
+                    nonce.unwrap(),
+                    to.public_key
+                ),
                 None => println!("Pulled from wallet with nonce: {:?}", nonce.unwrap()),
             }
 
@@ -106,9 +113,8 @@ impl Wallet {
             .eth()
             .send_raw_transaction(signed.raw_transaction)
             .await;
-        
 
-            println!("Transaction Hash: {:?}", result);
+        println!("Transaction Hash: {:?}", result);
 
         Ok(())
     }

@@ -11,7 +11,8 @@ use web3::types::{Address, U256};
 pub struct MutableState {
     pub wallets: Vec<Wallet>,
     pub wallet_index: Mutex<usize>,
-    pub hot_wallet: Wallet
+    pub hot_wallet: Wallet,
+    pub wallet_balance: U256,
 }
 impl MutableState {
     pub async fn new(immutable_state: Arc<ImmutableState>) -> Arc<Self> {
@@ -63,7 +64,7 @@ impl MutableState {
                                 None,
                                 &hot_wallet,
                                 wl_gas_price,
-                                false
+                                false,
                             )
                             .await;
                         match pull_result {
@@ -90,7 +91,7 @@ impl MutableState {
                                 Some(wallet_balance),
                                 &wallet,
                                 wl_gas_price,
-                                false
+                                false,
                             )
                             .await;
                         match send_result {
@@ -125,6 +126,7 @@ impl MutableState {
             wallets: loaded_wallets,
             wallet_index: Mutex::new(0),
             hot_wallet,
+            wallet_balance,
         })
     }
 
