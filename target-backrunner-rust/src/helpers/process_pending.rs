@@ -10,8 +10,8 @@ use web3::{
 
 async fn process_transaction(
     transaction: Transaction,
-    immutable_state: Arc<ImmutableState>,
-    mutable_state: Arc<MutableState>,
+    immutable_state: &Arc<ImmutableState>,
+    mutable_state: &Arc<MutableState>,
 ) {
     match transaction.to {
         Some(to_address) => {
@@ -31,7 +31,7 @@ async fn process_transaction(
                                     params,
                                     transaction.gas_price,
                                     exchange_index,
-                                    immutable_state.clone(),
+                                    immutable_state,
                                     mutable_state,
                                 )
                                 .await
@@ -63,7 +63,7 @@ pub async fn process_hash(
                 match result_tx_data {
                     Ok(optional_tx_data) => match optional_tx_data {
                         Some(tx_data) => {
-                            process_transaction(tx_data, immutable_state, mutable_state).await;
+                            process_transaction(tx_data, &immutable_state, &mutable_state).await;
                         }
                         None => {}
                     },

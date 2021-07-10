@@ -33,7 +33,7 @@ impl Wallet {
         }
     }
 
-    pub async fn load_from_pk(private_key: String, immutable_state: Arc<ImmutableState>) -> Self {
+    pub async fn load_from_pk(private_key: String, immutable_state: &Arc<ImmutableState>) -> Self {
         let private_key = PrivateKey::from_str(&private_key).unwrap();
         let public_key =
             Address::from_str(&private_key.to_public_key().unwrap().to_string()).unwrap();
@@ -48,7 +48,7 @@ impl Wallet {
 
     pub async fn send_to_wallet(
         &self,
-        immutable_state: Arc<ImmutableState>,
+        immutable_state: &Arc<ImmutableState>,
         optional_amount: Option<U256>,
         to: &Wallet,
         gas_price: U256,

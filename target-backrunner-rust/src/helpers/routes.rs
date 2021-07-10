@@ -15,8 +15,8 @@ pub async fn make_simple_routes(
     token2: &H160,
     gas_price: U256,
     exchange_index: usize,
-    immutable_state: Arc<ImmutableState>,
-    mutable_state: Arc<MutableState>,
+    immutable_state: &Arc<ImmutableState>,
+    mutable_state: &Arc<MutableState>,
 ) {
     let mut routes: Vec<Bytes> = Vec::new();
 
@@ -75,14 +75,14 @@ pub async fn make_simple_routes(
     while routes.len() > 0 {
         let bundle: Vec<Bytes> = routes.drain(0..min(bundle_size, routes.len())).collect();
         let (tx_obj, wallet_index) = make_simple_tx(
-            immutable_state.clone(),
+            immutable_state,
             bundle,
-            mutable_state.clone(),
+            mutable_state,
             gas_price,
         );
         send_transaction(
-            immutable_state.clone(),
-            mutable_state.clone(),
+            immutable_state,
+            mutable_state,
             wallet_index,
             tx_obj,
         )
@@ -95,8 +95,8 @@ pub async fn make_tri_routes(
     token2: &H160,
     gas_price: U256,
     exchange_index: usize,
-    immutable_state: Arc<ImmutableState>,
-    mutable_state: Arc<MutableState>,
+    immutable_state: &Arc<ImmutableState>,
+    mutable_state: &Arc<MutableState>,
 ) {
     // Find the correct pool ordering and record whether the route should be reversed
     let (token1, token2, should_reverse) = favor_outer_token(token1, token2, &immutable_state);
@@ -107,7 +107,7 @@ pub async fn make_tri_routes(
         token2,
         should_reverse,
         exchange_index,
-        immutable_state.clone(),
+        immutable_state,
     );
 
     // This combines the inners and outers, not sure if thats what we want
@@ -119,14 +119,14 @@ pub async fn make_tri_routes(
             .drain(0..min(bundle_size, outer_routes.len()))
             .collect();
         let (tx_obj, wallet_index) = make_tri_tx(
-            immutable_state.clone(),
+            immutable_state,
             bundle,
-            mutable_state.clone(),
+            mutable_state,
             gas_price,
         );
         send_transaction(
-            immutable_state.clone(),
-            mutable_state.clone(),
+            immutable_state,
+            mutable_state,
             wallet_index,
             tx_obj,
         )
@@ -139,7 +139,7 @@ fn outer_tri_routes(
     token2: &H160,
     should_reverse: bool,
     exchange_index: usize,
-    immutable_state: Arc<ImmutableState>,
+    immutable_state: &Arc<ImmutableState>,
 ) -> Vec<Bytes> {
     // Token1 is preferred
     let mut routes: Vec<Bytes> = Vec::new();

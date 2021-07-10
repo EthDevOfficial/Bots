@@ -13,8 +13,8 @@ async fn process_token_path(
     token_path: &Value,
     gas_price: U256,
     exchange_index: usize,
-    immutable_state: Arc<ImmutableState>,
-    mutable_state: Arc<MutableState>,
+    immutable_state: &Arc<ImmutableState>,
+    mutable_state: &Arc<MutableState>,
 ) {
     match token_path {
         Array(path, _) => {
@@ -32,8 +32,8 @@ async fn process_token_path(
                                         &H160::from_slice(token2.as_bytes()),
                                         gas_price,
                                         exchange_index,
-                                        immutable_state.clone(),
-                                        mutable_state.clone(),
+                                        immutable_state,
+                                        mutable_state,
                                     )
                                     .await;
                                 }
@@ -43,8 +43,8 @@ async fn process_token_path(
                                         &H160::from_slice(token2.as_bytes()),
                                         gas_price,
                                         exchange_index,
-                                        immutable_state.clone(),
-                                        mutable_state.clone(),
+                                        immutable_state,
+                                        mutable_state,
                                     )
                                     .await;
                                 }
@@ -65,8 +65,8 @@ pub async fn process_router_params(
     decoded_parameters: DecodedParams,
     gas_price: U256,
     exchange_index: usize,
-    immutable_state: Arc<ImmutableState>,
-    mutable_state: Arc<MutableState>,
+    immutable_state: &Arc<ImmutableState>,
+    mutable_state: &Arc<MutableState>,
 ) {
     if function_headers.name == "swapExactTokensForTokens"
         || function_headers.name == "swapExactTokensForETH"

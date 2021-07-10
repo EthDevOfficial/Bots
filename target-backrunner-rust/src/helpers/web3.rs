@@ -17,9 +17,9 @@ use_contract!(optimizer, "./abis/optimizerExec.json");
 use optimizer::functions;
 
 pub fn make_simple_tx(
-    immutable_state: Arc<ImmutableState>,
+    immutable_state: &Arc<ImmutableState>,
     bundle: Vec<Bytes>,
-    mutable_state: Arc<MutableState>,
+    mutable_state: &Arc<MutableState>,
     gas_price: U256,
 ) -> (TransactionParameters, usize) {
     let wallet_index = mutable_state.increment_wallet_index();
@@ -39,9 +39,9 @@ pub fn make_simple_tx(
 }
 
 pub fn make_tri_tx(
-    immutable_state: Arc<ImmutableState>,
+    immutable_state: &Arc<ImmutableState>,
     bundle: Vec<Bytes>,
-    mutable_state: Arc<MutableState>,
+    mutable_state: &Arc<MutableState>,
     gas_price: U256,
 ) -> (TransactionParameters, usize) {
     let wallet_index = mutable_state.increment_wallet_index();
@@ -60,8 +60,8 @@ pub fn make_tri_tx(
 }
 
 pub async fn send_transaction(
-    immutable_state: Arc<ImmutableState>,
-    mutable_state: Arc<MutableState>,
+    immutable_state: &Arc<ImmutableState>,
+    mutable_state: &Arc<MutableState>,
     wallet_index: usize,
     tx: TransactionParameters,
 ) {
@@ -94,7 +94,7 @@ pub async fn send_transaction(
                         mutable_state
                             .hot_wallet
                             .send_to_wallet(
-                                immutable_state.clone(),
+                                immutable_state,
                                 Some(mutable_state.wallet_balance),
                                 &mutable_state.wallets[wallet_index],
                                 51.into(),
