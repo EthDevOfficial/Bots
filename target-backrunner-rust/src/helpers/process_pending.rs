@@ -52,9 +52,9 @@ pub async fn process_hash(
     immutable_state: Arc<ImmutableState>,
     mutable_state: Arc<MutableState>,
 ) {
-    match tx_hash {
-        Ok(hash) => {
-            tokio::spawn(async move {
+    tokio::spawn(async move {
+        match tx_hash {
+            Ok(hash) => {
                 let result_tx_data = immutable_state
                     .web3
                     .eth()
@@ -68,11 +68,9 @@ pub async fn process_hash(
                         None => {}
                     },
                     Err(error) => println!("SPAWN TX HANDLER ERROR: {:?}", error),
-                };
-            })
-            .await
-            .unwrap();
+                }
+            }
+            Err(error) => println!("{:?}", error),
         }
-        Err(error) => println!("{:?}", error),
-    }
+    });
 }

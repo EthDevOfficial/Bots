@@ -74,19 +74,9 @@ pub async fn make_simple_routes(
     let bundle_size = immutable_state.bundle_size;
     while routes.len() > 0 {
         let bundle: Vec<Bytes> = routes.drain(0..min(bundle_size, routes.len())).collect();
-        let (tx_obj, wallet_index) = make_simple_tx(
-            immutable_state,
-            bundle,
-            mutable_state,
-            gas_price,
-        );
-        send_transaction(
-            immutable_state,
-            mutable_state,
-            wallet_index,
-            tx_obj,
-        )
-        .await;
+        let (tx_obj, wallet_index) =
+            make_simple_tx(immutable_state, bundle, mutable_state, gas_price);
+        send_transaction(immutable_state, mutable_state, wallet_index, tx_obj).await;
     }
 }
 
@@ -118,19 +108,8 @@ pub async fn make_tri_routes(
         let bundle: Vec<Bytes> = outer_routes
             .drain(0..min(bundle_size, outer_routes.len()))
             .collect();
-        let (tx_obj, wallet_index) = make_tri_tx(
-            immutable_state,
-            bundle,
-            mutable_state,
-            gas_price,
-        );
-        send_transaction(
-            immutable_state,
-            mutable_state,
-            wallet_index,
-            tx_obj,
-        )
-        .await;
+        let (tx_obj, wallet_index) = make_tri_tx(immutable_state, bundle, mutable_state, gas_price);
+        send_transaction(immutable_state, mutable_state, wallet_index, tx_obj).await;
     }
 }
 

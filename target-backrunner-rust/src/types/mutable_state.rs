@@ -50,16 +50,9 @@ impl MutableState {
             match prev_wallets_pk {
                 Some(prev_wallets_pk) => {
                     for (wallet_id, private_key) in prev_wallets_pk.into_iter().enumerate() {
-                        let prev_wallet =
-                            Wallet::load_from_pk(private_key, immutable_state).await;
+                        let prev_wallet = Wallet::load_from_pk(private_key, immutable_state).await;
                         let pull_result = prev_wallet
-                            .send_to_wallet(
-                                immutable_state,
-                                None,
-                                &hot_wallet,
-                                wl_gas_price,
-                                false,
-                            )
+                            .send_to_wallet(immutable_state, None, &hot_wallet, wl_gas_price, false)
                             .await;
                         match pull_result {
                             Ok(()) => (),
