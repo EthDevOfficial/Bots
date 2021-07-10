@@ -59,6 +59,7 @@ pub fn make_tri_tx(
     )
 }
 
+#[allow(unused_must_use)]
 pub async fn send_transaction(
     immutable_state: &Arc<ImmutableState>,
     mutable_state: &Arc<MutableState>,
