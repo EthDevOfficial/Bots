@@ -50,7 +50,7 @@ pub async fn make_simple_routes(
                     token2,
                     &away_exchange.router,
                     &return_exchange.router,
-                    (away_exchange.swap_fee + return_exchange.swap_fee).into(),
+                    U256::from(away_exchange.swap_fee + return_exchange.swap_fee),
                 ));
             }
         }
@@ -65,7 +65,7 @@ pub async fn make_simple_routes(
                     token2,
                     &away_exchange.router,
                     &return_exchange.router,
-                    (away_exchange.swap_fee + return_exchange.swap_fee).into(),
+                    U256::from(away_exchange.swap_fee + return_exchange.swap_fee),
                 ));
             }
         }
@@ -105,10 +105,11 @@ pub async fn make_outer_tri_routes(
                         &primary_exchange.router,
                         &primary_exchange.router,
                         &immutable_state.exchanges[exchange_index].router,
-                        (primary_exchange.swap_fee
-                            + primary_exchange.swap_fee
-                            + immutable_state.exchanges[exchange_index].swap_fee)
-                            .into(),
+                        U256::from(
+                            primary_exchange.swap_fee
+                                + primary_exchange.swap_fee
+                                + immutable_state.exchanges[exchange_index].swap_fee,
+                        ),
                     ));
                 } else {
                     // (T1, T2, E1) -> (T2, InnerT, E2) -> (InnerT, T1, E3)
@@ -119,10 +120,11 @@ pub async fn make_outer_tri_routes(
                         &immutable_state.exchanges[exchange_index].router,
                         &primary_exchange.router,
                         &primary_exchange.router,
-                        (primary_exchange.swap_fee
-                            + primary_exchange.swap_fee
-                            + immutable_state.exchanges[exchange_index].swap_fee)
-                            .into(),
+                        U256::from(
+                            primary_exchange.swap_fee
+                                + primary_exchange.swap_fee
+                                + immutable_state.exchanges[exchange_index].swap_fee,
+                        ),
                     ));
                 }
             }
@@ -159,10 +161,11 @@ pub async fn make_inner_tri_routes(
                     &primary_exchange.router,
                     &immutable_state.exchanges[exchange_index].router,
                     &primary_exchange.router,
-                    (primary_exchange.swap_fee
-                        + primary_exchange.swap_fee
-                        + immutable_state.exchanges[exchange_index].swap_fee)
-                        .into(),
+                    U256::from(
+                        primary_exchange.swap_fee
+                            + primary_exchange.swap_fee
+                            + immutable_state.exchanges[exchange_index].swap_fee,
+                    ),
                 ));
             }
         }
