@@ -17,9 +17,9 @@ use_contract!(optimizer, "./abis/optimizerExec.json");
 use optimizer::functions;
 
 pub fn make_simple_tx(
-    immutable_state: Arc<ImmutableState>,
+    immutable_state: &Arc<ImmutableState>,
     bundle: Vec<Bytes>,
-    mutable_state: Arc<MutableState>,
+    mutable_state: &Arc<MutableState>,
     gas_price: U256,
 ) -> (TransactionParameters, usize) {
     let wallet_index = mutable_state.increment_wallet_index();
@@ -29,7 +29,7 @@ pub fn make_simple_tx(
             to: Some(immutable_state.contract),
             gas_price: Some(gas_price),
             gas: 600_000.into(),
-            nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
+            // nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
             chain_id: Some(immutable_state.chain_id),
             data: functions::simple_multicall::encode_input(bundle).into(),
             ..Default::default()
@@ -39,9 +39,9 @@ pub fn make_simple_tx(
 }
 
 pub fn make_tri_tx(
-    immutable_state: Arc<ImmutableState>,
+    immutable_state: &Arc<ImmutableState>,
     bundle: Vec<Bytes>,
-    mutable_state: Arc<MutableState>,
+    mutable_state: &Arc<MutableState>,
     gas_price: U256,
 ) -> (TransactionParameters, usize) {
     let wallet_index = mutable_state.increment_wallet_index();
@@ -50,7 +50,7 @@ pub fn make_tri_tx(
             to: Some(immutable_state.contract),
             gas_price: Some(gas_price),
             gas: 600_000.into(),
-            nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
+            // nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
             chain_id: Some(immutable_state.chain_id),
             data: functions::tri_multicall::encode_input(bundle).into(),
             ..Default::default()
@@ -59,9 +59,10 @@ pub fn make_tri_tx(
     )
 }
 
+#[allow(unused_must_use)]
 pub async fn send_transaction(
-    immutable_state: Arc<ImmutableState>,
-    mutable_state: Arc<MutableState>,
+    immutable_state: &Arc<ImmutableState>,
+    mutable_state: &Arc<MutableState>,
     wallet_index: usize,
     tx: TransactionParameters,
 ) {
@@ -83,7 +84,7 @@ pub async fn send_transaction(
     match result {
         Ok(response) => {
             // looks like this response may need decode to be readable
-            mutable_state.wallets[wallet_index].increment_nonce();
+            // mutable_state.wallets[wallet_index].increment_nonce();
         }
         Err(error) => {
             println!("{}", error);
@@ -94,7 +95,7 @@ pub async fn send_transaction(
                         mutable_state
                             .hot_wallet
                             .send_to_wallet(
-                                immutable_state.clone(),
+                                immutable_state,
                                 Some(mutable_state.wallet_balance),
                                 &mutable_state.wallets[wallet_index],
                                 51.into(),

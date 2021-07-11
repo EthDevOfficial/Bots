@@ -15,7 +15,7 @@ pub struct MutableState {
     pub wallet_balance: U256,
 }
 impl MutableState {
-    pub async fn new(immutable_state: Arc<ImmutableState>) -> Arc<Self> {
+    pub async fn new(immutable_state: &Arc<ImmutableState>) -> Arc<Self> {
         // Wallets
         let wallet_path: String = env::var("WALLET_PATH").unwrap_or("./wallets.json".to_string());
         let gen_new_wallets: bool = env::var("GEN_NEW_WALLETS")
@@ -35,7 +35,7 @@ impl MutableState {
 
         let hot_wallet = Wallet::load_from_pk(
             "593b7e767faafbe9d60488cc01dc748ee83ce3aef4a8c5cbff80ee94bb5ec7bf".to_string(),
-            immutable_state.clone(),
+            immutable_state,
         )
         .await;
 
@@ -50,16 +50,9 @@ impl MutableState {
             match prev_wallets_pk {
                 Some(prev_wallets_pk) => {
                     for (wallet_id, private_key) in prev_wallets_pk.into_iter().enumerate() {
-                        let prev_wallet =
-                            Wallet::load_from_pk(private_key, immutable_state.clone()).await;
+                        let prev_wallet = Wallet::load_from_pk(private_key, immutable_state).await;
                         let pull_result = prev_wallet
-                            .send_to_wallet(
-                                immutable_state.clone(),
-                                None,
-                                &hot_wallet,
-                                wl_gas_price,
-                                false,
-                            )
+                            .send_to_wallet(immutable_state, None, &hot_wallet, wl_gas_price, false)
                             .await;
                         match pull_result {
                             Ok(()) => (),
@@ -81,7 +74,7 @@ impl MutableState {
                     Ok(wallet) => {
                         let send_result = hot_wallet
                             .send_to_wallet(
-                                immutable_state.clone(),
+                                immutable_state,
                                 Some(wallet_balance),
                                 &wallet,
                                 wl_gas_price,
@@ -112,7 +105,7 @@ impl MutableState {
         let mut loaded_wallets: Vec<Wallet> = Vec::new();
 
         for (wallet_id, private_key) in loaded_wallets_pk.into_iter().enumerate() {
-            loaded_wallets.push(Wallet::load_from_pk(private_key, immutable_state.clone()).await);
+            loaded_wallets.push(Wallet::load_from_pk(private_key, immutable_state).await);
             println!("loaded wallet {}", wallet_id);
         }
 

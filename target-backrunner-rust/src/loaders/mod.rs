@@ -19,6 +19,6 @@ pub async fn load_immutable_state() -> Arc<ImmutableState> {
     }
 }
 
-pub async fn load_mutable_state(immutable_state: Arc<ImmutableState>) -> Arc<MutableState> {
+pub async fn load_mutable_state(immutable_state: &Arc<ImmutableState>) -> Arc<MutableState> {
     MutableState::new(immutable_state).await
 }

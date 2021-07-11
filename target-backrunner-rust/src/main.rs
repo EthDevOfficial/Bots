@@ -10,7 +10,7 @@ use web3::futures::StreamExt;
 #[tokio::main]
 async fn main() {
     let immutable_state = loaders::load_immutable_state().await;
-    let mutable_state = loaders::load_mutable_state(immutable_state.clone()).await;
+    let mutable_state = loaders::load_mutable_state(&immutable_state).await;
     println!("starting target backrunner");
 
     immutable_state

@@ -1,4 +1,4 @@
-use super::enums::Router;
+use super::enums::{Router, Router::Uniswap};
 use crate::helpers::abi;
 use ethereum_abi::Abi;
 use std::str::FromStr;
