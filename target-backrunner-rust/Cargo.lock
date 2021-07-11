@@ -1365,6 +1365,7 @@ dependencies = [
  "ethabi-derive",
  "ethereum_abi",
  "num-bigint 0.4.0",
+ "primitive-types 0.8.0",
  "rand 0.8.4",
  "secp256k1",
  "serde_json",
