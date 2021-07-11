@@ -54,15 +54,10 @@ impl Tokens {
             wxdai: Token::new(
                 "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
                 100, // amount
-                1, // divisor
-                18 // decimals
+                1,   // divisor
+                18,  // decimals
             ),
-            weth: Token::new(
-                "0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1",
-                5,
-                100,
-                18
-            ),
+            weth: Token::new("0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1", 5, 100, 18),
             hny: Token::new("0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9", 3, 10, 18), // .3
             agve: Token::new("0x3a97704a1b25F08aa230ae53B352e2e72ef52843", 5, 10, 18), // .5
             usdc: Token::new("0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83", 100, 1, 6), // 100

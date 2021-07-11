@@ -17,7 +17,9 @@ impl Token {
     pub fn new(address: &str, min_trade_amount: usize, divisor: usize, decimals: usize) -> Token {
         Token {
             address: H160::from_str(address).unwrap(),
-            min_trade_amount_wei: U256::from(min_trade_amount).saturating_mul(U256::exp10(decimals)) / divisor,
+            min_trade_amount_wei: U256::from(min_trade_amount)
+                .saturating_mul(U256::exp10(decimals))
+                / divisor,
         }
     }
 

@@ -54,18 +54,8 @@ struct Tokens {
 impl Tokens {
     pub fn new() -> Tokens {
         Tokens {
-            wmatic: Token::new(
-                "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
-                100,
-                1,
-                18
-            ),
-            weth: Token::new(
-                "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
-                5,
-                100,
-                18
-            ),
+            wmatic: Token::new("0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", 100, 1, 18),
+            weth: Token::new("0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619", 5, 100, 18),
             quick: Token::new("0x831753DD7087CaC61aB5644b308642cc1c33Dc13", 3, 10, 18),
             wbtc: Token::new("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6", 3, 1000, 8),
             usdt: Token::new("0xc2132D05D31c914a87C6611C10748AEb04B58e8F", 100, 1, 6),
