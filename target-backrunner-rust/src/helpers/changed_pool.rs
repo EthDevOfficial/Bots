@@ -1,11 +1,11 @@
 use crate::helpers::routes::{make_simple_routes, make_tri_routes};
 use crate::types::immutable_state::ImmutableState;
 use crate::types::mutable_state::MutableState;
-use primitive_types::U256;
 use ethereum_abi::{
     DecodedParams, Function, Value,
-    Value::{Address, Array},
+    Value::{Address, Array, Uint},
 };
+use primitive_types::U256;
 use std::sync::Arc;
 use web3::types::{H160, U256 as Web3U256};
 
@@ -75,6 +75,7 @@ pub async fn process_router_params(
                     &token_path[token_path.len() - 1],
                     &decoded_parameters[0].value,
                     &decoded_parameters[1].value,
+                    immutable_state,
                 ) {
                     process_token_path(
                         token_path,
@@ -94,11 +95,12 @@ pub async fn process_router_params(
         let token_path = &decoded_parameters[1].value;
         match token_path {
             Array(token_path, _) => {
-                if above_trade_threshold(
+                if above_trade_threshold_web3(
                     &token_path[token_path.len() - 1],
                     &token_path[0],
                     &decoded_parameters[0].value,
-                    &Value::Uint(U256::from_dec_str(&tx_value.to_string()).unwrap(), 0),
+                    &tx_value,
+                    immutable_state,
                 ) {
                     process_token_path(
                         token_path,
@@ -123,6 +125,7 @@ pub async fn process_router_params(
                     &token_path[0],
                     &decoded_parameters[0].value,
                     &decoded_parameters[1].value,
+                    immutable_state,
                 ) {
                     process_token_path(
                         token_path,
@@ -146,6 +149,49 @@ pub fn above_trade_threshold(
     out_token: &Value,
     in_amount: &Value,
     out_amount: &Value,
+    immutable_state: &Arc<ImmutableState>,
 ) -> bool {
-    true
+    above_one_trade_threshold(in_token, in_amount, immutable_state)
+        || above_one_trade_threshold(out_token, out_amount, immutable_state)
+}
+
+pub fn above_trade_threshold_web3(
+    in_token: &Value,
+    out_token: &Value,
+    in_amount: &Value,
+    out_amount: &Web3U256,
+    immutable_state: &Arc<ImmutableState>,
+) -> bool {
+    above_one_trade_threshold(in_token, in_amount, immutable_state)
+        || above_one_trade_threshold(
+            out_token,
+            &Value::Uint(U256::from_dec_str(&out_amount.to_string()).unwrap(), 0),
+            immutable_state,
+        )
+}
+
+fn above_one_trade_threshold(
+    token: &Value,
+    amount: &Value,
+    immutable_state: &Arc<ImmutableState>,
+) -> bool {
+    match token {
+        Address(token) => {
+            let token_index = immutable_state
+                .inner_tokens
+                .iter()
+                .position(|inner_token| inner_token.address.as_bytes() == token.as_bytes());
+            match token_index {
+                Some(token_index) => {
+                    let token = &immutable_state.inner_tokens[token_index];
+                    match amount {
+                        Uint(amount, _) => token.above_trade_threshold(amount),
+                        _ => false,
+                    }
+                }
+                None => false,
+            }
+        }
+        _ => false,
+    }
 }
