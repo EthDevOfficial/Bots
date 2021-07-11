@@ -141,9 +141,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "clarity"
-version = "0.4.11"
+version = "0.4.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c4d0255e48d61f1a33e9aab934613f3e44deb22b401c9199705ae54438f68cf"
+checksum = "ef8749bcae70d65c0705636ee675020490f35e05cf4ec2d4b78455aeca2194f7"
 dependencies = [
  "lazy_static",
  "num-bigint 0.4.0",
@@ -1365,6 +1365,7 @@ dependencies = [
  "ethabi-derive",
  "ethereum_abi",
  "num-bigint 0.4.0",
+ "primitive-types 0.8.0",
  "rand 0.8.4",
  "secp256k1",
  "serde_json",
@@ -1418,9 +1419,9 @@ checksum = "cda74da7e1a664f795bb1f8a87ec406fb89a02522cf6e50620d016add6dbbf5c"
 
 [[package]]
 name = "tokio"
-version = "1.7.1"
+version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5fb2ed024293bb19f7a5dc54fe83bf86532a44c12a2bb8ba40d64a4509395ca2"
+checksum = "98c8b05dc14c75ea83d63dd391100353789f5f24b8b3866542a5e85c8be8e985"
 dependencies = [
  "autocfg",
  "bytes 1.0.1",

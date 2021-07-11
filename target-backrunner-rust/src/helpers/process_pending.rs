@@ -1,6 +1,7 @@
 use crate::helpers::{abi::decode, changed_pool::process_router_params};
 use crate::types::immutable_state::ImmutableState;
 use crate::types::mutable_state::MutableState;
+use primitive_types::U256;
 use std::option;
 use std::sync::Arc;
 use web3::{
@@ -29,6 +30,7 @@ async fn process_transaction(
                                 process_router_params(
                                     func,
                                     params,
+                                    transaction.value,
                                     transaction.gas_price,
                                     exchange_index,
                                     immutable_state,

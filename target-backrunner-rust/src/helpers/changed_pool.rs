@@ -1,69 +1,72 @@
-use crate::helpers::routes::{make_simple_routes, make_tri_routes};
+use crate::helpers::routes::{make_inner_tri_routes, make_outer_tri_routes, make_simple_routes};
 use crate::types::immutable_state::ImmutableState;
 use crate::types::mutable_state::MutableState;
-use ethabi::ethereum_types::U256;
 use ethereum_abi::{
     DecodedParams, Function, Value,
-    Value::{Address, Array},
+    Value::{Address, Array, Uint},
 };
+use primitive_types::U256;
 use std::sync::Arc;
-use web3::types::H160;
+use web3::types::{H160, U256 as Web3U256};
 
 async fn process_token_path(
-    token_path: &Value,
-    gas_price: U256,
+    token_path: &Vec<Value>,
+    gas_price: Web3U256,
     exchange_index: usize,
     immutable_state: &Arc<ImmutableState>,
     mutable_state: &Arc<MutableState>,
 ) {
-    match token_path {
-        Array(path, _) => {
-            for i in 0..(path.len() - 1) {
-                match path[i] {
-                    Address(token1) => match path[i + 1] {
-                        Address(token2) => {
-                            if immutable_state.outer_tokens.iter().any(|token| {
-                                token.address.as_bytes() == token1.as_bytes()
-                                    || token.address.as_bytes() == token2.as_bytes()
-                            }) {
-                                if immutable_state.run_simples {
-                                    make_simple_routes(
-                                        &H160::from_slice(token1.as_bytes()),
-                                        &H160::from_slice(token2.as_bytes()),
-                                        gas_price,
-                                        exchange_index,
-                                        immutable_state,
-                                        mutable_state,
-                                    )
-                                    .await;
-                                }
-                                if immutable_state.run_tris {
-                                    make_tri_routes(
-                                        &H160::from_slice(token1.as_bytes()),
-                                        &H160::from_slice(token2.as_bytes()),
-                                        gas_price,
-                                        exchange_index,
-                                        immutable_state,
-                                        mutable_state,
-                                    )
-                                    .await;
-                                }
-                            }
-                        }
-                        _ => {}
-                    },
-                    _ => {}
+    for i in 0..(token_path.len() - 1) {
+        match token_path[i] {
+            Address(token1) => match token_path[i + 1] {
+                Address(token2) => {
+                    if immutable_state.outer_tokens.iter().any(|token| {
+                        token.address.as_bytes() == token1.as_bytes()
+                            || token.address.as_bytes() == token2.as_bytes()
+                    }) {
+                        make_simple_routes(
+                            &H160::from_slice(token1.as_bytes()),
+                            &H160::from_slice(token2.as_bytes()),
+                            gas_price,
+                            exchange_index,
+                            immutable_state,
+                            mutable_state,
+                        )
+                        .await;
+
+                        make_outer_tri_routes(
+                            &H160::from_slice(token1.as_bytes()),
+                            &H160::from_slice(token2.as_bytes()),
+                            gas_price,
+                            exchange_index,
+                            immutable_state,
+                            mutable_state,
+                        )
+                        .await;
+                    } else {
+                        make_inner_tri_routes(
+                            &H160::from_slice(token1.as_bytes()),
+                            &H160::from_slice(token2.as_bytes()),
+                            gas_price,
+                            exchange_index,
+                            immutable_state,
+                            mutable_state,
+                        )
+                        .await;
+                    }
                 }
-            }
+                _ => {}
+            },
+            _ => {}
         }
-        _ => {}
     }
 }
 
 pub async fn process_router_params(
     function_headers: &Function,
     decoded_parameters: DecodedParams,
-    gas_price: U256,
+    tx_value: Web3U256,
+    gas_price: Web3U256,
     exchange_index: usize,
     immutable_state: &Arc<ImmutableState>,
     mutable_state: &Arc<MutableState>,
@@ -72,39 +75,130 @@ pub async fn process_router_params(
         || function_headers.name == "swapExactTokensForETH"
     {
         let token_path = &decoded_parameters[2].value;
-        process_token_path(
-            token_path,
-            gas_price,
-            exchange_index,
-            immutable_state,
-            mutable_state,
-        )
-        .await;
+        match token_path {
+            Array(token_path, _) => {
+                if above_trade_threshold(
+                    &token_path[0],
+                    &token_path[token_path.len() - 1],
+                    &decoded_parameters[0].value,
+                    &decoded_parameters[1].value,
+                    immutable_state,
+                ) {
+                    process_token_path(
+                        token_path,
+                        gas_price,
+                        exchange_index,
+                        immutable_state,
+                        mutable_state,
+                    )
+                    .await;
+                }
+            }
+            _ => (),
+        }
     } else if function_headers.name == "swapExactETHForTokens"
         || function_headers.name == "swapETHForExactTokens"
     {
         let token_path = &decoded_parameters[1].value;
-        process_token_path(
-            token_path,
-            gas_price,
-            exchange_index,
-            immutable_state,
-            mutable_state,
-        )
-        .await;
+        match token_path {
+            Array(token_path, _) => {
+                if above_trade_threshold_web3(
+                    &token_path[token_path.len() - 1],
+                    &token_path[0],
+                    &decoded_parameters[0].value,
+                    &tx_value,
+                    immutable_state,
+                ) {
+                    process_token_path(
+                        token_path,
+                        gas_price,
+                        exchange_index,
+                        immutable_state,
+                        mutable_state,
+                    )
+                    .await;
+                }
+            }
+            _ => (),
+        }
     } else if function_headers.name == "swapTokensForExactTokens"
         || function_headers.name == "swapTokensForExactETH"
     {
         let token_path = &decoded_parameters[2].value;
-        process_token_path(
-            token_path,
-            gas_price,
-            exchange_index,
-            immutable_state,
-            mutable_state,
-        )
-        .await;
+        match token_path {
+            Array(token_path, _) => {
+                if above_trade_threshold(
+                    &token_path[token_path.len() - 1],
+                    &token_path[0],
+                    &decoded_parameters[0].value,
+                    &decoded_parameters[1].value,
+                    immutable_state,
+                ) {
+                    process_token_path(
+                        token_path,
+                        gas_price,
+                        exchange_index,
+                        immutable_state,
+                        mutable_state,
+                    )
+                    .await;
+                }
+            }
+            _ => (),
+        }
     } else {
         // println!("missed all swap func names: {}", function_headers.name)
+    }
+}
+
+pub fn above_trade_threshold(
+    in_token: &Value,
+    out_token: &Value,
+    in_amount: &Value,
+    out_amount: &Value,
+    immutable_state: &Arc<ImmutableState>,
+) -> bool {
+    above_one_trade_threshold(in_token, in_amount, immutable_state)
+        || above_one_trade_threshold(out_token, out_amount, immutable_state)
+}
+
+pub fn above_trade_threshold_web3(
+    in_token: &Value,
+    out_token: &Value,
+    in_amount: &Value,
+    out_amount: &Web3U256,
+    immutable_state: &Arc<ImmutableState>,
+) -> bool {
+    above_one_trade_threshold(in_token, in_amount, immutable_state)
+        || above_one_trade_threshold(
+            out_token,
+            &Value::Uint(U256::from_dec_str(&out_amount.to_string()).unwrap(), 0),
+            immutable_state,
+        )
+}
+
+fn above_one_trade_threshold(
+    token: &Value,
+    amount: &Value,
+    immutable_state: &Arc<ImmutableState>,
+) -> bool {
+    match token {
+        Address(token) => {
+            let token_index = immutable_state
+                .inner_tokens
+                .iter()
+                .position(|inner_token| inner_token.address.as_bytes() == token.as_bytes());
+            match token_index {
+                Some(token_index) => {
+                    let token = &immutable_state.inner_tokens[token_index];
+                    match amount {
+                        Uint(amount, _) => token.above_trade_threshold(amount),
+                        _ => false,
+                    }
+                }
+                None => false,
+            }
+        }
+        _ => false,
     }
 }

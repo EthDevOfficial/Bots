@@ -10,12 +10,11 @@ pub async fn load_immutable_state() -> Arc<ImmutableState> {
     let tokens = Tokens::new();
     let exchanges = Exchanges::new();
 
-    let outer_tokens = vec![tokens.weth.clone(), tokens.wmatic.clone()];
+    let outer_tokens = vec![tokens.wmatic.clone()];
     let inner_tokens = vec![
         tokens.weth,
         tokens.wmatic,
         tokens.bone,
-        tokens.titan,
         tokens.usdc,
         tokens.pup,
     ];
@@ -55,24 +54,18 @@ struct Tokens {
 impl Tokens {
     pub fn new() -> Tokens {
         Tokens {
-            quick: Token::new("0x831753DD7087CaC61aB5644b308642cc1c33Dc13", "0"),
-            wmatic: Token::new(
-                "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
-                "1000000000000000000000",
-            ),
-            weth: Token::new(
-                "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
-                "500000000000000000",
-            ),
-            wbtc: Token::new("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6", "0"),
-            usdt: Token::new("0xc2132D05D31c914a87C6611C10748AEb04B58e8F", "1000000000"),
-            dai: Token::new("0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063", "0"),
-            usdc: Token::new("0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", "1000000000"),
-            pup: Token::new("0xcFe2cF35D2bDDE84967e67d00aD74237e234CE59", "0"),
-            dfyn: Token::new("0xC168E40227E4ebD8C1caE80F7a55a4F0e6D66C97", "0"),
-            bone: Token::new("0x6bb45cEAC714c52342Ef73ec663479da35934bf7", "0"),
-            route: Token::new("0x16ECCfDbb4eE1A85A33f3A9B21175Cd7Ae753dB4", "0"),
-            titan: Token::new("0xaAa5B9e6c589642f98a1cDA99B9D024B8407285A", "0"),
+            wmatic: Token::new("0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", 100, 1, 18),
+            weth: Token::new("0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619", 5, 100, 18),
+            quick: Token::new("0x831753DD7087CaC61aB5644b308642cc1c33Dc13", 3, 10, 18),
+            wbtc: Token::new("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6", 3, 1000, 8),
+            usdt: Token::new("0xc2132D05D31c914a87C6611C10748AEb04B58e8F", 100, 1, 6),
+            dai: Token::new("0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063", 0, 1, 18),
+            usdc: Token::new("0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", 100, 1, 6),
+            pup: Token::new("0xcFe2cF35D2bDDE84967e67d00aD74237e234CE59", 2, 1, 18),
+            dfyn: Token::new("0xC168E40227E4ebD8C1caE80F7a55a4F0e6D66C97", 50, 1, 18),
+            bone: Token::new("0x6bb45cEAC714c52342Ef73ec663479da35934bf7", 2, 1, 18),
+            route: Token::new("0x16ECCfDbb4eE1A85A33f3A9B21175Cd7Ae753dB4", 0, 1, 18),
+            titan: Token::new("0xaAa5B9e6c589642f98a1cDA99B9D024B8407285A", 1000000, 1, 18),
         }
     }
 }
