@@ -14,15 +14,20 @@ impl Token {
     //     }
     // }
 
-    pub fn new(address: &str, min_trade_amount: usize, decimals: usize) -> Token {
+    pub fn new(address: &str, min_trade_amount: usize, divisor: usize, decimals: usize) -> Token {
         Token {
             address: H160::from_str(address).unwrap(),
-            min_trade_amount_wei: U256::from(min_trade_amount).saturating_mul(U256::exp10(decimals)),
+            min_trade_amount_wei: U256::from(min_trade_amount).saturating_mul(U256::exp10(decimals)) / divisor,
         }
     }
 
     pub fn above_trade_threshold(&self, amount: &U256) -> bool {
         amount.gt(&self.min_trade_amount_wei)
+        // if self.min_trade_amount_wei != U256::zero() {
+        //     amount.gt(&self.min_trade_amount_wei)
+        // } else {
+        //     false
+        // }
     }
 }
 impl Clone for Token {
