@@ -7,11 +7,11 @@ use ethereum_abi::{
     Value::{Address, Array},
 };
 use std::sync::Arc;
-use web3::types::{H160, U256 as Web3_U256};
+use web3::types::{H160, U256 as Web3U256};
 
 async fn process_token_path(
     token_path: &Vec<Value>,
-    gas_price: Web3_U256,
+    gas_price: Web3U256,
     exchange_index: usize,
     immutable_state: &Arc<ImmutableState>,
     mutable_state: &Arc<MutableState>,
@@ -58,8 +58,8 @@ async fn process_token_path(
 pub async fn process_router_params(
     function_headers: &Function,
     decoded_parameters: DecodedParams,
-    tx_value: U256,
-    gas_price: Web3_U256,
+    tx_value: Web3U256,
+    gas_price: Web3U256,
     exchange_index: usize,
     immutable_state: &Arc<ImmutableState>,
     mutable_state: &Arc<MutableState>,
@@ -98,7 +98,7 @@ pub async fn process_router_params(
                     &token_path[token_path.len() - 1],
                     &token_path[0],
                     &decoded_parameters[0].value,
-                    &Value::Uint(tx_value, 0),
+                    &Value::Uint(U256::from_dec_str(&tx_value.to_string()).unwrap(), 0),
                 ) {
                     process_token_path(
                         token_path,
@@ -147,4 +147,5 @@ pub fn above_trade_threshold(
     in_amount: &Value,
     out_amount: &Value,
 ) -> bool {
+    true
 }

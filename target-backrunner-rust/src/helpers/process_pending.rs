@@ -30,8 +30,8 @@ async fn process_transaction(
                                 process_router_params(
                                     func,
                                     params,
-                                    U256::from_dec_str(&transaction.value.to_string()).unwrap(),
-                                    transaction.gas_price.to_string(),
+                                    transaction.value,
+                                    transaction.gas_price,
                                     exchange_index,
                                     immutable_state,
                                     mutable_state,
