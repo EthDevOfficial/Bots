@@ -1,4 +1,4 @@
-use crate::helpers::routes::{make_simple_routes, make_tri_routes};
+use crate::helpers::routes::{make_inner_tri_routes, make_outer_tri_routes, make_simple_routes};
 use crate::types::immutable_state::ImmutableState;
 use crate::types::mutable_state::MutableState;
 use ethereum_abi::{
@@ -24,28 +24,35 @@ async fn process_token_path(
                         token.address.as_bytes() == token1.as_bytes()
                             || token.address.as_bytes() == token2.as_bytes()
                     }) {
-                        if immutable_state.run_simples {
-                            make_simple_routes(
-                                &H160::from_slice(token1.as_bytes()),
-                                &H160::from_slice(token2.as_bytes()),
-                                gas_price,
-                                exchange_index,
-                                immutable_state,
-                                mutable_state,
-                            )
-                            .await;
-                        }
-                        if immutable_state.run_tris {
-                            make_tri_routes(
-                                &H160::from_slice(token1.as_bytes()),
-                                &H160::from_slice(token2.as_bytes()),
-                                gas_price,
-                                exchange_index,
-                                immutable_state,
-                                mutable_state,
-                            )
-                            .await;
-                        }
+                        make_simple_routes(
+                            &H160::from_slice(token1.as_bytes()),
+                            &H160::from_slice(token2.as_bytes()),
+                            gas_price,
+                            exchange_index,
+                            immutable_state,
+                            mutable_state,
+                        )
+                        .await;
+
+                        make_outer_tri_routes(
+                            &H160::from_slice(token1.as_bytes()),
+                            &H160::from_slice(token2.as_bytes()),
+                            gas_price,
+                            exchange_index,
+                            immutable_state,
+                            mutable_state,
+                        )
+                        .await;
+                    } else {
+                        make_inner_tri_routes(
+                            &H160::from_slice(token1.as_bytes()),
+                            &H160::from_slice(token2.as_bytes()),
+                            gas_price,
+                            exchange_index,
+                            immutable_state,
+                            mutable_state,
+                        )
+                        .await;
                     }
                 }
                 _ => {}
