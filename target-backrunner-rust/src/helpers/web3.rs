@@ -13,9 +13,6 @@ use web3::{
     Error, Result, Web3,
 };
 
-use_contract!(optimizer, "./abis/optimizerExec.json");
-use optimizer::functions;
-
 pub fn make_simple_tx(
     immutable_state: &Arc<ImmutableState>,
     bundle: Vec<Bytes>,
@@ -31,7 +28,7 @@ pub fn make_simple_tx(
             gas: 600_000.into(),
             // nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
             chain_id: Some(immutable_state.chain_id),
-            data: functions::simple_multicall::encode_input(bundle).into(),
+            data: (immutable_state.simple_multicall)(bundle).into(),
             ..Default::default()
         },
         wallet_index,
@@ -52,7 +49,7 @@ pub fn make_tri_tx(
             gas: 600_000.into(),
             // nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
             chain_id: Some(immutable_state.chain_id),
-            data: functions::tri_multicall::encode_input(bundle).into(),
+            data: (immutable_state.tri_multicall)(bundle).into(),
             ..Default::default()
         },
         wallet_index,
