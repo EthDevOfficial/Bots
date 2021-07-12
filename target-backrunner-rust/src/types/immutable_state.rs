@@ -3,9 +3,14 @@ use crate::types::enums::Chain;
 use crate::types::exchange::Exchange;
 use crate::types::token::Token;
 use ethabi::ethereum_types::U256;
+use ethabi::Bytes;
+use ethabi_contract::use_contract;
 use std::{env, str::FromStr, vec::Vec};
 use web3::types::H160;
 use web3::{transports::WebSocket, Web3};
+
+use_contract!(optimizer, "./abis/optimizerExec.json");
+use optimizer::functions;
 
 pub struct ImmutableState {
     pub chain: Chain,
@@ -23,6 +28,8 @@ pub struct ImmutableState {
     pub run_tris: bool,
     pub run_simples: bool,
     pub bundle_size: usize,
+    pub simple_multicall: fn(Vec<Vec<u8>>) -> Vec<u8>,
+    pub tri_multicall: fn(Vec<Vec<u8>>) -> Vec<u8>,
 }
 impl ImmutableState {
     pub async fn new(
@@ -66,6 +73,18 @@ impl ImmutableState {
             .iter()
             .for_each(|secondary: &Exchange| exchanges.push(secondary.clone()));
 
+        let simple_multicall = if chain != Chain::Polygon {
+            |bundle: Vec<Bytes>| functions::simple_multicall::encode_input(bundle)
+        } else {
+            |bundle: Vec<Bytes>| functions::simple_multicall_chi::encode_input(bundle)
+        };
+
+        let tri_multicall = if chain != Chain::Polygon {
+            |bundle: Vec<Bytes>| functions::tri_multicall::encode_input(bundle)
+        } else {
+            |bundle: Vec<Bytes>| functions::tri_multicall_chi::encode_input(bundle)
+        };
+
         ImmutableState {
             chain,
             chain_id: web3
@@ -92,6 +111,8 @@ impl ImmutableState {
             run_simples,
             run_tris,
             bundle_size,
+            simple_multicall,
+            tri_multicall,
         }
     }
 }
