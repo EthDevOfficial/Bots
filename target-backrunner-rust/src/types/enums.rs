@@ -13,5 +13,5 @@ pub enum Arb {
 #[derive(Clone, PartialEq)]
 pub enum Router {
     Uniswap,
-    Aggregator
+    Firebird,
 }

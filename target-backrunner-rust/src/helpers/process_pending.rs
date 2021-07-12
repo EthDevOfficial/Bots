@@ -1,4 +1,5 @@
-use crate::helpers::{abi::decode, changed_pool::process_router_params};
+use crate::helpers::{abi::decode, changed_pool::{process_uniswap_router_params, process_firebird_router_params}};
+use crate::types::enums::Router;
 use crate::types::immutable_state::ImmutableState;
 use crate::types::mutable_state::MutableState;
 use primitive_types::U256;
@@ -27,16 +28,32 @@ async fn process_transaction(
                             decode(encoded_tx, &immutable_state.exchanges[exchange_index].abi);
                         match option_abi {
                             Some((func, params)) => {
-                                process_router_params(
-                                    func,
-                                    params,
-                                    transaction.value,
-                                    transaction.gas_price,
-                                    exchange_index,
-                                    immutable_state,
-                                    mutable_state,
-                                )
-                                .await
+                                match immutable_state.exchanges[exchange_index].router_type {
+                                    Router::Uniswap => {
+                                        // process_uniswap_router_params(
+                                        //     func,
+                                        //     params,
+                                        //     transaction.value,
+                                        //     transaction.gas_price,
+                                        //     exchange_index,
+                                        //     immutable_state,
+                                        //     mutable_state,
+                                        // )
+                                        // .await
+                                    }
+                                    Router::Firebird => {
+                                        process_firebird_router_params(
+                                            func,
+                                            params,
+                                            transaction.value,
+                                            transaction.gas_price,
+                                            exchange_index,
+                                            immutable_state,
+                                            mutable_state,
+                                        )
+                                        .await
+                                    }
+                                }
                             }
                             None => (),
                         }

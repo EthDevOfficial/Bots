@@ -5,10 +5,10 @@ use ethereum_abi::{
     DecodedParams, Function, Value,
     Value::{Address, Array, Uint},
 };
+use futures;
 use primitive_types::U256;
 use std::sync::Arc;
 use web3::types::{H160, U256 as Web3U256};
-use futures;
 
 async fn process_token_path(
     token_path: &Vec<Value>,
@@ -64,7 +64,7 @@ async fn process_token_path(
     }
 }
 
-pub async fn process_router_params(
+pub async fn process_uniswap_router_params(
     function_headers: &Function,
     decoded_parameters: DecodedParams,
     tx_value: Web3U256,
@@ -152,6 +152,21 @@ pub async fn process_router_params(
         // println!("missed all swap func names: {}", function_headers.name)
     }
 }
+
+pub async fn process_firebird_router_params(
+    function_headers: &Function,
+    decoded_parameters: DecodedParams,
+    tx_value: Web3U256,
+    gas_price: Web3U256,
+    exchange_index: usize,
+    immutable_state: &Arc<ImmutableState>,
+    mutable_state: &Arc<MutableState>,
+) {
+    println!("HIT");
+    println!("{:?}", function_headers);
+    println!("{:?}", decoded_parameters);
+
+ }
 
 pub fn above_trade_threshold(
     in_token: &Value,

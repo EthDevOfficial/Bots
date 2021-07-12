@@ -19,7 +19,7 @@ impl MutableState {
         // Wallets
         let wallet_path: String = env::var("WALLET_PATH").unwrap_or("./wallets.json".to_string());
         let gen_new_wallets: bool = env::var("GEN_NEW_WALLETS")
-            .unwrap_or("true".to_string())
+            .unwrap_or("false".to_string())
             .eq("true");
 
         let num_wallets: usize = env::var("NUM_WALLETS")
