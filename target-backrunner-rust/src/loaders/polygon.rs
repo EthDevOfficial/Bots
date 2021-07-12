@@ -78,7 +78,7 @@ struct Exchanges {
     sushiswap: Exchange,
     dfyn: Exchange,
     apeswap: Exchange,
-    jetswap: Exchange
+    jetswap: Exchange,
 }
 impl Exchanges {
     pub fn new() -> Exchanges {
