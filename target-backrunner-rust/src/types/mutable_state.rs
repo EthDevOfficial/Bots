@@ -74,27 +74,33 @@ impl MutableState {
                                 .await;
                         let mut current_nonce = previous_nonce;
                         let mut poll_count = 0;
-                        while poll_count < 10 {
+                        while previous_nonce == current_nonce {
                             // Send the first attempt to load the wallet
-                            let send_result = hot_wallet
-                                .send_to_wallet(
-                                    immutable_state,
-                                    Some(wallet_balance),
-                                    &wallet,
-                                    wl_gas_price,
-                                    false,
-                                )
-                                .await;
-                            while previous_nonce == current_nonce {
-                                // Poll the hot wallet nonce until it increments. If it doesn't afte 10 polls, we resend
-                                current_nonce = Wallet::get_nonce_from_chain(
-                                    &hot_wallet.public_key,
-                                    immutable_state,
-                                )
-                                .await;
+                            if poll_count == 0 {
+                                let send_result = hot_wallet
+                                    .send_to_wallet(
+                                        immutable_state,
+                                        Some(wallet_balance),
+                                        &wallet,
+                                        wl_gas_price,
+                                        false,
+                                    )
+                                    .await;
+                            }
 
-                                let poll_time = std::time::Duration::from_secs(3);
-                                std::thread::sleep(poll_time);
+                            // Poll the hot wallet nonce until it increments. If it doesn't after 10 polls, we resend
+                            let poll_time = std::time::Duration::from_secs(2);
+                            std::thread::sleep(poll_time);
+
+                            current_nonce = Wallet::get_nonce_from_chain(
+                                &hot_wallet.public_key,
+                                immutable_state,
+                            )
+                            .await;
+
+                            if poll_count == 9 {
+                                poll_count = 0;
+                            } else {
                                 poll_count += 1;
                             }
                         }
