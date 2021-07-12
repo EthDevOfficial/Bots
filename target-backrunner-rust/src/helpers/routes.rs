@@ -74,7 +74,7 @@ pub async fn make_simple_routes(
     for i in (0..routes.len()).step_by(immutable_state.bundle_size) {
         let (tx_obj, wallet_index) = make_simple_tx(
             immutable_state,
-            &routes[i..min(i + immutable_state.bundle_size, routes.len())],
+            Vec::from(&routes[i..min(i + immutable_state.bundle_size, routes.len())]),
             mutable_state,
             gas_price,
         );
@@ -143,7 +143,7 @@ pub async fn make_outer_tri_routes(
     for i in (0..routes.len()).step_by(immutable_state.bundle_size) {
         let (tx_obj, wallet_index) = make_tri_tx(
             immutable_state,
-            &routes[i..min(i + immutable_state.bundle_size, routes.len())],
+            Vec::from(&routes[i..min(i + immutable_state.bundle_size, routes.len())]),
             mutable_state,
             gas_price,
         );
@@ -193,7 +193,7 @@ pub async fn make_inner_tri_routes(
     for i in (0..routes.len()).step_by(immutable_state.bundle_size) {
         let (tx_obj, wallet_index) = make_tri_tx(
             immutable_state,
-            &routes[i..min(i + immutable_state.bundle_size, routes.len())],
+            Vec::from(&routes[i..min(i + immutable_state.bundle_size, routes.len())]),
             mutable_state,
             gas_price,
         );
