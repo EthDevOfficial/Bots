@@ -54,7 +54,7 @@ impl MutableState {
                         let pull_result = prev_wallet
                             .send_to_wallet(immutable_state, None, &hot_wallet, wl_gas_price, false)
                             .await;
-                        println!("Pulled from wallet [{:?}]", i);
+                        println!("Pulled from wallet [{:?}]", wallet_id);
                         match pull_result {
                             Ok(()) => (),
                             Err(err) => println!("wallet [{}] pull error: {:?}", wallet_id, err),
@@ -74,7 +74,7 @@ impl MutableState {
                             Wallet::get_nonce_from_chain(&hot_wallet.public_key, immutable_state)
                                 .await;
                         let mut current_nonce = previous_nonce;
-                        let mut poll_count = 0;
+                        let mut poll_count: i32 = 0;
                         while previous_nonce == current_nonce {
                             // Send the first attempt to load the wallet
                             if poll_count == 0 {
