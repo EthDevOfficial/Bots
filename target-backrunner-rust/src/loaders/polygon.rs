@@ -97,7 +97,7 @@ impl Exchanges {
             dfyn: Exchange::new(
                 "0xA102072A4C07F06EC3B4900FDC4C7B80b6c57429",
                 30,
-                &Router::Uniswap,
+                &Router::Dfyn,
             ),
             apeswap: Exchange::new(
                 "0xC0788A3aD43d79aa53B09c2EaCc313A787d1d607",

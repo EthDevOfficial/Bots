@@ -29,7 +29,21 @@ async fn process_transaction(
                         match option_abi {
                             Some((func, params)) => {
                                 match immutable_state.exchanges[exchange_index].router_type {
-                                    Router::Uniswap => {
+                                    Router::Firebird => {
+                                        println!("HIT");
+
+                                        process_firebird_router_params(
+                                            func,
+                                            params,
+                                            transaction.value,
+                                            transaction.gas_price,
+                                            exchange_index,
+                                            immutable_state,
+                                            mutable_state,
+                                        )
+                                        .await
+                                    },
+                                    _ => {
                                         // process_uniswap_router_params(
                                         //     func,
                                         //     params,
@@ -41,21 +55,9 @@ async fn process_transaction(
                                         // )
                                         // .await
                                     }
-                                    Router::Firebird => {
-                                        process_firebird_router_params(
-                                            func,
-                                            params,
-                                            transaction.value,
-                                            transaction.gas_price,
-                                            exchange_index,
-                                            immutable_state,
-                                            mutable_state,
-                                        )
-                                        .await
-                                    }
                                 }
                             }
-                            None => (),
+                            None => println!("None {:?}", immutable_state.exchanges[exchange_index].router),
                         }
                     }
                 },
