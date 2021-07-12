@@ -19,7 +19,7 @@ impl MutableState {
         // Wallets
         let wallet_path: String = env::var("WALLET_PATH").unwrap_or("./wallets.json".to_string());
         let gen_new_wallets: bool = env::var("GEN_NEW_WALLETS")
-            .unwrap_or("true".to_string())
+            .unwrap_or("false".to_string())
             .eq("true");
 
         let num_wallets: usize = env::var("NUM_WALLETS")
@@ -113,10 +113,6 @@ impl MutableState {
                 }
             }
         }
-
-        let ten_sec = std::time::Duration::from_secs(20);
-        println!("Waiting {:?} for wallet cooldown", ten_sec);
-        std::thread::sleep(ten_sec);
 
         let loaded_wallets_pk = read_private_keys_from_file(&wallet_path).unwrap();
         let mut loaded_wallets: Vec<Wallet> = Vec::new();
