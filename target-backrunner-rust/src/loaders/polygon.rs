@@ -12,6 +12,7 @@ pub async fn load_immutable_state() -> Arc<ImmutableState> {
 
     let outer_tokens = vec![tokens.wmatic.clone()];
     let inner_tokens = vec![
+        tokens.pwings,
         tokens.weth,
         tokens.wmatic,
         tokens.bone,
@@ -19,8 +20,8 @@ pub async fn load_immutable_state() -> Arc<ImmutableState> {
         tokens.pup,
     ];
 
-    let primary_exchanges = vec![exchanges.quickswap];
-    let secondary_exchanges = vec![exchanges.sushiswap, exchanges.dfyn, exchanges.apeswap];
+    let primary_exchanges = vec![exchanges.quickswap, exchanges.jetswap, exchanges.sushiswap];
+    let secondary_exchanges = vec![exchanges.dfyn, exchanges.apeswap];
 
     let ignore_tokens = vec![];
 
@@ -41,6 +42,7 @@ struct Tokens {
     quick: Token,
     wmatic: Token,
     weth: Token,
+    pwings: Token,
     wbtc: Token,
     usdt: Token,
     dai: Token,
@@ -56,6 +58,7 @@ impl Tokens {
         Tokens {
             wmatic: Token::new("0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", 100, 1, 18),
             weth: Token::new("0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619", 5, 100, 18),
+            pwings: Token::new("0x845e76a8691423fbc4ecb8dd77556cb61c09ee25", 1000, 1, 18),
             quick: Token::new("0x831753DD7087CaC61aB5644b308642cc1c33Dc13", 3, 10, 18),
             wbtc: Token::new("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6", 3, 1000, 8),
             usdt: Token::new("0xc2132D05D31c914a87C6611C10748AEb04B58e8F", 100, 1, 6),
@@ -75,6 +78,7 @@ struct Exchanges {
     sushiswap: Exchange,
     dfyn: Exchange,
     apeswap: Exchange,
+    jetswap: Exchange
 }
 impl Exchanges {
     pub fn new() -> Exchanges {
@@ -97,6 +101,11 @@ impl Exchanges {
             apeswap: Exchange::new(
                 "0xC0788A3aD43d79aa53B09c2EaCc313A787d1d607",
                 20,
+                &Router::Uniswap,
+            ),
+            jetswap: Exchange::new(
+                "0x5C6EC38fb0e2609672BDf628B1fD605A523E5923",
+                10,
                 &Router::Uniswap,
             ),
         }
