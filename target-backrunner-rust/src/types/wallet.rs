@@ -75,15 +75,6 @@ impl Wallet {
             let nonce =
                 Some(Wallet::get_nonce_from_chain(&self.public_key, &immutable_state).await);
 
-            match optional_amount {
-                Some(amount) => println!(
-                    "Sent from wallet with nonce: {:?} to: {:?}",
-                    nonce.unwrap(),
-                    to.public_key
-                ),
-                None => (),
-            }
-
             TransactionParameters {
                 to: Some(to.public_key),
                 value: amount,
@@ -108,8 +99,6 @@ impl Wallet {
             .eth()
             .send_raw_transaction(signed.raw_transaction)
             .await;
-
-        println!("Transaction Hash: {:?}", result);
 
         Ok(())
     }

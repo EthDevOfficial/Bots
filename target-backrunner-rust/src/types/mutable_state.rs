@@ -54,9 +54,10 @@ impl MutableState {
                         let pull_result = prev_wallet
                             .send_to_wallet(immutable_state, None, &hot_wallet, wl_gas_price, false)
                             .await;
+                        println!("Pulled from wallet [{:?}]", i);
                         match pull_result {
                             Ok(()) => (),
-                            Err(err) => println!("wallet {} pull error: {:?}", wallet_id, err),
+                            Err(err) => println!("wallet [{}] pull error: {:?}", wallet_id, err),
                         }
                     }
                 }
@@ -104,6 +105,7 @@ impl MutableState {
                                 poll_count += 1;
                             }
                         }
+                        println!("Loaded wallet [{:?}]", i);
                         loaded_wallets.push(wallet);
                         save_to_file(&loaded_wallets, &wallet_path);
                     }
