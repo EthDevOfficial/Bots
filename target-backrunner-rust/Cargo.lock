@@ -1364,6 +1364,7 @@ dependencies = [
  "ethabi-contract",
  "ethabi-derive",
  "ethereum_abi",
+ "futures",
  "num-bigint 0.4.0",
  "primitive-types 0.8.0",
  "rand 0.8.4",
