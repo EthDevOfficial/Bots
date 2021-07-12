@@ -123,7 +123,7 @@ impl Wallet {
         self.nonce.lock().unwrap().clone()
     }
 
-    async fn get_nonce_from_chain(
+    pub async fn get_nonce_from_chain(
         public_key: &Address,
         immutable_state: &Arc<ImmutableState>,
     ) -> U256 {
