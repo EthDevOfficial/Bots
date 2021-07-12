@@ -8,6 +8,7 @@ use ethereum_abi::{
 use primitive_types::U256;
 use std::sync::Arc;
 use web3::types::{H160, U256 as Web3U256};
+use futures;
 
 async fn process_token_path(
     token_path: &Vec<Value>,
@@ -24,25 +25,26 @@ async fn process_token_path(
                         token.address.as_bytes() == token1.as_bytes()
                             || token.address.as_bytes() == token2.as_bytes()
                     }) {
-                        make_simple_routes(
-                            &H160::from_slice(token1.as_bytes()),
-                            &H160::from_slice(token2.as_bytes()),
+                        let token1_h160 = H160::from_slice(token1.as_bytes());
+                        let token2_h160 = H160::from_slice(token2.as_bytes());
+                        let simple_future = make_simple_routes(
+                            &token1_h160,
+                            &token2_h160,
                             gas_price,
                             exchange_index,
                             immutable_state,
                             mutable_state,
-                        )
-                        .await;
+                        );
 
-                        make_outer_tri_routes(
-                            &H160::from_slice(token1.as_bytes()),
-                            &H160::from_slice(token2.as_bytes()),
+                        let tri_future = make_outer_tri_routes(
+                            &token1_h160,
+                            &token2_h160,
                             gas_price,
                             exchange_index,
                             immutable_state,
                             mutable_state,
-                        )
-                        .await;
+                        );
+                        futures::join!(tri_future, simple_future);
                     } else {
                         make_inner_tri_routes(
                             &H160::from_slice(token1.as_bytes()),
