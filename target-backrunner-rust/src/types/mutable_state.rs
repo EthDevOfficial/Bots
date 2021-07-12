@@ -19,7 +19,7 @@ impl MutableState {
         // Wallets
         let wallet_path: String = env::var("WALLET_PATH").unwrap_or("./wallets.json".to_string());
         let gen_new_wallets: bool = env::var("GEN_NEW_WALLETS")
-            .unwrap_or("true".to_string())
+            .unwrap_or("false".to_string())
             .eq("true");
 
         let num_wallets: usize = env::var("NUM_WALLETS")
@@ -54,52 +54,65 @@ impl MutableState {
                         let pull_result = prev_wallet
                             .send_to_wallet(immutable_state, None, &hot_wallet, wl_gas_price, false)
                             .await;
+                        println!("Pulled from wallet [{:?}]", wallet_id);
                         match pull_result {
                             Ok(()) => (),
-                            Err(err) => println!("wallet {} pull error: {:?}", wallet_id, err),
+                            Err(err) => println!("wallet [{}] pull error: {:?}", wallet_id, err),
                         }
                     }
                 }
                 None => (),
             };
 
-            // let ten_sec = std::time::Duration::from_secs(30);
-            // println!("Waiting {:?} for wallet cooldown", ten_sec);
-            // std::thread::sleep(ten_sec);
-
             // Create, send balance, and save wallets
             for i in 0..num_wallets {
                 let wallet = Wallet::create_new();
                 match wallet {
                     Ok(wallet) => {
-                        let send_result = hot_wallet
-                            .send_to_wallet(
+                        // Get the current hot wallet nonce
+                        let previous_nonce =
+                            Wallet::get_nonce_from_chain(&hot_wallet.public_key, immutable_state)
+                                .await;
+                        let mut current_nonce = previous_nonce;
+                        let mut poll_count: i32 = 0;
+                        while previous_nonce == current_nonce {
+                            // Send the first attempt to load the wallet
+                            if poll_count == 0 {
+                                let send_result = hot_wallet
+                                    .send_to_wallet(
+                                        immutable_state,
+                                        Some(wallet_balance),
+                                        &wallet,
+                                        wl_gas_price,
+                                        false,
+                                    )
+                                    .await;
+                            }
+
+                            // Poll the hot wallet nonce until it increments. If it doesn't after 10 polls, we resend
+                            let poll_time = std::time::Duration::from_secs(2);
+                            std::thread::sleep(poll_time);
+
+                            current_nonce = Wallet::get_nonce_from_chain(
+                                &hot_wallet.public_key,
                                 immutable_state,
-                                Some(wallet_balance),
-                                &wallet,
-                                wl_gas_price,
-                                false,
                             )
                             .await;
-                        match send_result {
-                            Ok(()) => {
-                                loaded_wallets.push(wallet);
-                                save_to_file(&loaded_wallets, &wallet_path);
-                            }
-                            Err(err) => println!("failed wallet send: {:?}", err),
-                        }
-                        let ten_millis = std::time::Duration::from_millis(6000);
 
-                        std::thread::sleep(ten_millis);
+                            if poll_count == 9 {
+                                poll_count = 0;
+                            } else {
+                                poll_count += 1;
+                            }
+                        }
+                        println!("Loaded wallet [{:?}]", i);
+                        loaded_wallets.push(wallet);
+                        save_to_file(&loaded_wallets, &wallet_path);
                     }
                     Err(error) => println!("wallet creation error: {:?}", error),
                 }
             }
         }
-
-        let ten_sec = std::time::Duration::from_secs(20);
-        println!("Waiting {:?} for wallet cooldown", ten_sec);
-        std::thread::sleep(ten_sec);
 
         let loaded_wallets_pk = read_private_keys_from_file(&wallet_path).unwrap();
         let mut loaded_wallets: Vec<Wallet> = Vec::new();
