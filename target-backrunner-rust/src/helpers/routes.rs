@@ -5,11 +5,11 @@ use crate::types::{
 };
 use ethabi::ethereum_types::U256;
 use ethabi::{Bytes, Token as Tokenized};
+use futures::future::join_all;
 use std::cmp::min;
 use std::sync::Arc;
 use std::vec::Vec;
 use web3::types::{TransactionParameters, H160};
-use futures::future::join_all;
 
 pub async fn make_simple_routes(
     token1: &H160,
@@ -191,7 +191,14 @@ pub async fn make_inner_tri_routes(
         }
     }
 
-    send_routes(routes, gas_price, make_tri_tx, immutable_state, mutable_state).await;
+    send_routes(
+        routes,
+        gas_price,
+        make_tri_tx,
+        immutable_state,
+        mutable_state,
+    )
+    .await;
 }
 
 async fn send_routes(
