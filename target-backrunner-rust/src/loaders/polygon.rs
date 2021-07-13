@@ -84,6 +84,7 @@ struct Exchanges {
     dfyn: Exchange,
     apeswap: Exchange,
     jetswap: Exchange,
+    firebird: Exchange,
 }
 impl Exchanges {
     pub fn new() -> Exchanges {
@@ -101,7 +102,7 @@ impl Exchanges {
             dfyn: Exchange::new(
                 "0xA102072A4C07F06EC3B4900FDC4C7B80b6c57429",
                 30,
-                &Router::Uniswap,
+                &Router::Dfyn,
             ),
             apeswap: Exchange::new(
                 "0xC0788A3aD43d79aa53B09c2EaCc313A787d1d607",
@@ -112,6 +113,11 @@ impl Exchanges {
                 "0x5C6EC38fb0e2609672BDf628B1fD605A523E5923",
                 10,
                 &Router::Uniswap,
+            ),
+            firebird: Exchange::new(
+                "0xF6fa9Ea1f64f1BBfA8d71f7f43fAF6D45520bfac",
+                0,
+                &Router::Firebird,
             ),
         }
     }

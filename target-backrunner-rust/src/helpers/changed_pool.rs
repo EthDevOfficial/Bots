@@ -64,7 +64,7 @@ async fn process_token_path(
     }
 }
 
-pub async fn process_router_params(
+pub async fn process_uniswap_router_params(
     function_headers: &Function,
     decoded_parameters: DecodedParams,
     tx_value: Web3U256,
@@ -105,10 +105,10 @@ pub async fn process_router_params(
         match token_path {
             Array(token_path, _) => {
                 if above_trade_threshold_web3(
-                    &token_path[token_path.len() - 1],
                     &token_path[0],
-                    &decoded_parameters[0].value,
+                    &token_path[token_path.len() - 1],
                     &tx_value,
+                    &decoded_parameters[0].value,
                     immutable_state,
                 ) {
                     process_token_path(
@@ -130,10 +130,10 @@ pub async fn process_router_params(
         match token_path {
             Array(token_path, _) => {
                 if above_trade_threshold(
-                    &token_path[token_path.len() - 1],
                     &token_path[0],
-                    &decoded_parameters[0].value,
+                    &token_path[token_path.len() - 1],
                     &decoded_parameters[1].value,
+                    &decoded_parameters[0].value,
                     immutable_state,
                 ) {
                     process_token_path(
@@ -153,6 +153,20 @@ pub async fn process_router_params(
     }
 }
 
+pub async fn process_firebird_router_params(
+    function_headers: &Function,
+    decoded_parameters: DecodedParams,
+    tx_value: Web3U256,
+    gas_price: Web3U256,
+    exchange_index: usize,
+    immutable_state: &Arc<ImmutableState>,
+    mutable_state: &Arc<MutableState>,
+) {
+    println!("HIT");
+    println!("{:?}", function_headers);
+    println!("{:?}", decoded_parameters);
+}
+
 pub fn above_trade_threshold(
     in_token: &Value,
     out_token: &Value,
@@ -167,14 +181,14 @@ pub fn above_trade_threshold(
 pub fn above_trade_threshold_web3(
     in_token: &Value,
     out_token: &Value,
-    in_amount: &Value,
-    out_amount: &Web3U256,
+    in_amount: &Web3U256,
+    out_amount: &Value,
     immutable_state: &Arc<ImmutableState>,
 ) -> bool {
-    above_one_trade_threshold(in_token, in_amount, immutable_state)
+    above_one_trade_threshold(out_token, out_amount, immutable_state)
         || above_one_trade_threshold(
-            out_token,
-            &Value::Uint(U256::from_dec_str(&out_amount.to_string()).unwrap(), 0),
+            in_token,
+            &Value::Uint(U256::from_dec_str(&in_amount.to_string()).unwrap(), 0),
             immutable_state,
         )
 }

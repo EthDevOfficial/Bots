@@ -1,4 +1,4 @@
-use super::enums::{Router, Router::Uniswap};
+use super::enums::{Router, Router::Dfyn, Router::Firebird, Router::Uniswap};
 use crate::helpers::abi;
 use ethereum_abi::Abi;
 use std::str::FromStr;
@@ -14,9 +14,11 @@ pub struct Exchange {
 impl Exchange {
     pub fn new(router: &str, swap_fee: u32, router_type: &Router) -> Exchange {
         let this_file = file!();
-        let file_path = env::var("ABI_PATH").unwrap_or("./abis/uniswapRouter.json".to_string());
+        let file_path = env::var("ABI_PATH").unwrap_or("./abis/".to_string());
         let abi = match router_type {
-            Uniswap => abi::open(&file_path),
+            Uniswap => abi::open(&format!("{}uniswapRouter.json", file_path)),
+            Dfyn => abi::open(&format!("{}dfynRouter.json", file_path)),
+            Firebird => abi::open(&format!("{}firebirdRouter.json", file_path)),
         };
 
         Exchange {
