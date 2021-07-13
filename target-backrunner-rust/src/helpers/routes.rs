@@ -197,29 +197,32 @@ async fn send_routes(
     immutable_state: &Arc<ImmutableState>,
     mutable_state: &Arc<MutableState>,
 ) {
-    // for i in (0..routes.len()).step_by(immutable_state.bundle_size) {
-    //     let bundle = Vec::from(&routes[i..min(i + immutable_state.clone().bundle_size, routes.len())]);
-    //     tokio::spawn(async move {
-    //         let (tx_obj, wallet_index) = make_tx(&immutable_state.clone(), bundle, &mutable_state.clone(), gas_price);
-    //         send_transaction(&immutable_state.clone(), &mutable_state.clone(), wallet_index, tx_obj).await;
-    //     });
-    // }
+    for i in (0..routes.len()).step_by(immutable_state.bundle_size) {
+        let bundle = Vec::from(&routes[i..min(i + immutable_state.bundle_size, routes.len())]);
+        let immutable_state = immutable_state.clone();
+        let mutable_state = mutable_state.clone();
+        tokio::spawn(async move {
+            let (tx_obj, wallet_index) =
+                make_tx(&immutable_state, bundle, &mutable_state, gas_price);
+            send_transaction(&immutable_state, &mutable_state, wallet_index, tx_obj).await;
+        });
+    }
 
-    let txs: Vec<_> = routes
-        .iter()
-        .enumerate()
-        .step_by(immutable_state.bundle_size)
-        .map(|(i, _)| {
-            let (tx_obj, wallet_index) = make_tx(
-                immutable_state,
-                Vec::from(&routes[i..min(i + immutable_state.bundle_size, routes.len())]),
-                mutable_state,
-                gas_price,
-            );
-            send_transaction(immutable_state, mutable_state, wallet_index, tx_obj)
-        })
-        .collect();
-    join_all(txs).await;
+    // let txs: Vec<_> = routes
+    //     .iter()
+    //     .enumerate()
+    //     .step_by(immutable_state.bundle_size)
+    //     .map(|(i, _)| {
+    //         let (tx_obj, wallet_index) = make_tx(
+    //             immutable_state,
+    //             Vec::from(&routes[i..min(i + immutable_state.bundle_size, routes.len())]),
+    //             mutable_state,
+    //             gas_price,
+    //         );
+    //         send_transaction(immutable_state, mutable_state, wallet_index, tx_obj)
+    //     })
+    //     .collect();
+    // join_all(txs).await;
 }
 
 fn favor_outer_token<'a>(
