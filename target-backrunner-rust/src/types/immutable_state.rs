@@ -50,13 +50,13 @@ impl ImmutableState {
         let ws_url = env::var("WS_URL").unwrap_or("ws://34.204.203.210:8546".to_string());
         let web3 = connect_to_node(&ws_url).await.unwrap();
 
-        let web3_quick_node = connect_to_node(
+        let web3_infura = connect_to_node_http(
             "https://polygon-mainnet.infura.io/v3/8883e83b5ecc4d15837b55a135609ed9",
         )
         .await
         .unwrap();
-        
-        let web3_infura = connect_to_node_http("wss://green-falling-forest.matic.quiknode.pro/344dc1dfd1c484ac7ba5d25fc0732a38b640bdc7/").await.unwrap();
+
+        let web3_quick_node = connect_to_node("wss://green-falling-forest.matic.quiknode.pro/344dc1dfd1c484ac7ba5d25fc0732a38b640bdc7/").await.unwrap();
 
         // Contracts
         let contract = H160::from_str(
