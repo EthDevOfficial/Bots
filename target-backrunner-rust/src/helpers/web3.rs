@@ -25,7 +25,7 @@ pub fn make_simple_tx(
         TransactionParameters {
             to: Some(immutable_state.contract),
             gas_price: Some(gas_price),
-            gas: 600_000.into(),
+            gas: immutable_state.gas_limit.into(),
             // nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
             chain_id: Some(immutable_state.chain_id),
             data: (immutable_state.simple_multicall)(bundle).into(),
@@ -46,7 +46,7 @@ pub fn make_tri_tx(
         TransactionParameters {
             to: Some(immutable_state.contract),
             gas_price: Some(gas_price),
-            gas: 600_000.into(),
+            gas: immutable_state.gas_limit.into(),
             // nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
             chain_id: Some(immutable_state.chain_id),
             data: (immutable_state.tri_multicall)(bundle).into(),

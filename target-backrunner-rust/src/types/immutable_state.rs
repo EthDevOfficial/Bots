@@ -28,6 +28,7 @@ pub struct ImmutableState {
     pub run_tris: bool,
     pub run_simples: bool,
     pub bundle_size: usize,
+    pub gas_limit: usize,
     pub simple_multicall: fn(Vec<Vec<u8>>) -> Vec<u8>,
     pub tri_multicall: fn(Vec<Vec<u8>>) -> Vec<u8>,
 }
@@ -62,6 +63,11 @@ impl ImmutableState {
         // Bidding
         let bundle_size: usize = env::var("BUNDLE_SIZE")
             .unwrap_or("2".to_string())
+            .parse()
+            .unwrap();
+
+        let gas_limit: usize = env::var("GAS_LIMIT")
+            .unwrap_or("1200000".to_string())
             .parse()
             .unwrap();
         let mut exchanges: Vec<Exchange> = Vec::new();
@@ -111,6 +117,7 @@ impl ImmutableState {
             run_simples,
             run_tris,
             bundle_size,
+            gas_limit,
             simple_multicall,
             tri_multicall,
         }

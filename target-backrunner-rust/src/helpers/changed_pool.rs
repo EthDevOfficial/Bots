@@ -5,10 +5,10 @@ use ethereum_abi::{
     DecodedParams, Function, Value,
     Value::{Address, Array, Uint},
 };
+use futures;
 use primitive_types::U256;
 use std::sync::Arc;
 use web3::types::{H160, U256 as Web3U256};
-use futures;
 
 async fn process_token_path(
     token_path: &Vec<Value>,
