@@ -9,7 +9,7 @@ use futures::join;
 use std::sync::Arc;
 use web3::{
     signing,
-    transports::{Http, WebSocket},
+    transports::WebSocket,
     types::{TransactionParameters, H160},
     Error, Result, Web3,
 };
@@ -80,17 +80,17 @@ pub async fn send_transaction(
         .send_raw_transaction(signed.raw_transaction.clone())
         .await;
 
-    let infura_tx = immutable_state
-        .web3_infura
-        .eth()
-        .send_raw_transaction(signed.raw_transaction.clone());
+    // let infura_tx = immutable_state
+    //     .web3_infura
+    //     .eth()
+    //     .send_raw_transaction(signed.raw_transaction.clone());
 
-    let quick_node_tx = immutable_state
-        .web3_quick_node
-        .eth()
-        .send_raw_transaction(signed.raw_transaction);
+    // let quick_node_tx = immutable_state
+    //     .web3_quick_node
+    //     .eth()
+    //     .send_raw_transaction(signed.raw_transaction);
 
-    join!(infura_tx, quick_node_tx);
+    // join!(infura_tx, quick_node_tx);
 
     match result {
         Ok(response) => {
@@ -127,8 +127,8 @@ pub async fn connect_to_node(node_url: &str) -> Result<Web3<WebSocket>> {
     Ok(web3)
 }
 
-pub async fn connect_to_node_http(node_url: &str) -> Result<Web3<Http>> {
-    let transport = Http::new(node_url)?;
-    let web3 = Web3::new(transport);
-    Ok(web3)
-}
+// pub async fn connect_to_node_http(node_url: &str) -> Result<Web3<Http>> {
+//     let transport = Http::new(node_url)?;
+//     let web3 = Web3::new(transport);
+//     Ok(web3)
+// }
