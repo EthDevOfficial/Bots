@@ -7,7 +7,10 @@ use ethabi::Bytes;
 use ethabi_contract::use_contract;
 use std::{env, str::FromStr, vec::Vec};
 use web3::types::H160;
-use web3::{transports::WebSocket, Web3};
+use web3::{
+    transports::WebSocket,
+    Web3,
+};
 
 use_contract!(optimizer, "./abis/optimizerExec.json");
 use optimizer::functions;
@@ -16,9 +19,12 @@ pub struct ImmutableState {
     pub chain: Chain,
     pub chain_id: u64,
     pub web3: Web3<WebSocket>,
+    // pub web3_quick_node: Web3<Http>,
+    // pub web3_infura: Web3<Http>,
     pub primary_exchanges: Vec<Exchange>,
     pub secondary_exchanges: Vec<Exchange>,
     pub exchanges: Vec<Exchange>,
+    pub routers: Vec<Exchange>,
     pub inner_tokens: Vec<Token>,
     // pub inner_token_addresses: Vec<String>,
     pub outer_tokens: Vec<Token>,
@@ -37,6 +43,7 @@ impl ImmutableState {
         chain: Chain,
         primary_exchanges: Vec<Exchange>,
         secondary_exchanges: Vec<Exchange>,
+        aggregators: Vec<Exchange>,
         outer_tokens: Vec<Token>,
         inner_tokens: Vec<Token>,
         ignore_addresses: Vec<&str>,
@@ -44,6 +51,14 @@ impl ImmutableState {
         // Web3
         let ws_url = env::var("WS_URL").unwrap_or("ws://34.204.203.210:8546".to_string());
         let web3 = connect_to_node(&ws_url).await.unwrap();
+
+        // let web3_infura = connect_to_node_http(
+        //     "https://polygon-mainnet.infura.io/v3/8883e83b5ecc4d15837b55a135609ed9",
+        // )
+        // .await
+        // .unwrap();
+
+        // let web3_quick_node = connect_to_node_http("https://green-falling-forest.matic.quiknode.pro/").await.unwrap();
 
         // Contracts
         let contract = H160::from_str(
@@ -79,6 +94,18 @@ impl ImmutableState {
             .iter()
             .for_each(|secondary: &Exchange| exchanges.push(secondary.clone()));
 
+        let mut routers: Vec<Exchange> = Vec::new();
+
+        primary_exchanges
+            .iter()
+            .for_each(|primary: &Exchange| routers.push(primary.clone()));
+        secondary_exchanges
+            .iter()
+            .for_each(|secondary: &Exchange| routers.push(secondary.clone()));
+        aggregators
+            .iter()
+            .for_each(|agg: &Exchange| routers.push(agg.clone()));
+
         let simple_multicall = if chain != Chain::Polygon {
             |bundle: Vec<Bytes>| functions::simple_multicall::encode_input(bundle)
         } else {
@@ -102,9 +129,12 @@ impl ImmutableState {
                 .parse()
                 .unwrap(),
             web3,
+            // web3_quick_node,
+            // web3_infura,
             primary_exchanges: primary_exchanges.clone(),
             secondary_exchanges: secondary_exchanges.clone(),
             exchanges,
+            routers,
             outer_tokens: outer_tokens.clone(),
             // outer_token_addresses: outer_tokens.clone().into_iter().map(|token| token.address).collect(),
             inner_tokens: inner_tokens.clone(),
