@@ -5,10 +5,11 @@ use crate::types::{
 use ethabi::{ethereum_types::U256, Bytes};
 use ethabi_contract::use_contract;
 use ethabi_derive;
+use futures::join;
 use std::sync::Arc;
 use web3::{
     signing,
-    transports::WebSocket,
+    transports::{Http, WebSocket},
     types::{TransactionParameters, H160},
     Error, Result, Web3,
 };
@@ -26,7 +27,7 @@ pub fn make_simple_tx(
             to: Some(immutable_state.contract),
             gas_price: Some(gas_price),
             gas: immutable_state.gas_limit.into(),
-            // nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
+            nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
             chain_id: Some(immutable_state.chain_id),
             data: (immutable_state.simple_multicall)(bundle).into(),
             ..Default::default()
@@ -47,7 +48,7 @@ pub fn make_tri_tx(
             to: Some(immutable_state.contract),
             gas_price: Some(gas_price),
             gas: immutable_state.gas_limit.into(),
-            // nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
+            nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
             chain_id: Some(immutable_state.chain_id),
             data: (immutable_state.tri_multicall)(bundle).into(),
             ..Default::default()
@@ -72,16 +73,29 @@ pub async fn send_transaction(
         .sign_transaction(tx, &mutable_state.wallets[wallet_index].private_key)
         .await
         .unwrap();
+
     let result = immutable_state
         .web3
         .eth()
-        .send_raw_transaction(signed.raw_transaction)
+        .send_raw_transaction(signed.raw_transaction.clone())
         .await;
+
+    let infura_tx = immutable_state
+        .web3_infura
+        .eth()
+        .send_raw_transaction(signed.raw_transaction.clone());
+
+    let quick_node_tx = immutable_state
+        .web3_quick_node
+        .eth()
+        .send_raw_transaction(signed.raw_transaction);
+
+    join!(infura_tx, quick_node_tx);
 
     match result {
         Ok(response) => {
             // looks like this response may need decode to be readable
-            // mutable_state.wallets[wallet_index].increment_nonce();
+            mutable_state.wallets[wallet_index].increment_nonce();
         }
         Err(error) => {
             println!("{}", error);
@@ -109,6 +123,12 @@ pub async fn send_transaction(
 
 pub async fn connect_to_node(node_url: &str) -> Result<Web3<WebSocket>> {
     let transport = WebSocket::new(node_url).await?;
+    let web3 = Web3::new(transport);
+    Ok(web3)
+}
+
+pub async fn connect_to_node_http(node_url: &str) -> Result<Web3<Http>> {
+    let transport = Http::new(node_url)?;
     let web3 = Web3::new(transport);
     Ok(web3)
 }

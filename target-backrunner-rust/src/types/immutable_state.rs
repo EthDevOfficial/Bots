@@ -1,4 +1,4 @@
-use crate::helpers::web3::connect_to_node;
+use crate::helpers::web3::{connect_to_node, connect_to_node_http};
 use crate::types::enums::Chain;
 use crate::types::exchange::Exchange;
 use crate::types::token::Token;
@@ -7,7 +7,10 @@ use ethabi::Bytes;
 use ethabi_contract::use_contract;
 use std::{env, str::FromStr, vec::Vec};
 use web3::types::H160;
-use web3::{transports::WebSocket, Web3};
+use web3::{
+    transports::{Http, WebSocket},
+    Web3,
+};
 
 use_contract!(optimizer, "./abis/optimizerExec.json");
 use optimizer::functions;
@@ -16,6 +19,8 @@ pub struct ImmutableState {
     pub chain: Chain,
     pub chain_id: u64,
     pub web3: Web3<WebSocket>,
+    pub web3_quick_node: Web3<WebSocket>,
+    pub web3_infura: Web3<Http>,
     pub primary_exchanges: Vec<Exchange>,
     pub secondary_exchanges: Vec<Exchange>,
     pub exchanges: Vec<Exchange>,
@@ -44,6 +49,14 @@ impl ImmutableState {
         // Web3
         let ws_url = env::var("WS_URL").unwrap_or("ws://34.204.203.210:8546".to_string());
         let web3 = connect_to_node(&ws_url).await.unwrap();
+
+        let web3_quick_node = connect_to_node(
+            "https://polygon-mainnet.infura.io/v3/8883e83b5ecc4d15837b55a135609ed9",
+        )
+        .await
+        .unwrap();
+        
+        let web3_infura = connect_to_node_http("wss://green-falling-forest.matic.quiknode.pro/344dc1dfd1c484ac7ba5d25fc0732a38b640bdc7/").await.unwrap();
 
         // Contracts
         let contract = H160::from_str(
@@ -102,6 +115,8 @@ impl ImmutableState {
                 .parse()
                 .unwrap(),
             web3,
+            web3_quick_node,
+            web3_infura,
             primary_exchanges: primary_exchanges.clone(),
             secondary_exchanges: secondary_exchanges.clone(),
             exchanges,

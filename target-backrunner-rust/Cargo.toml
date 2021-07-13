@@ -7,7 +7,7 @@ edition = "2018"
 
 [dependencies]
 num-bigint = "0.4"
-web3 = { version = "0.16.0", default-features = false, features = ["ws-tokio", "signing"] }
+web3 = { version = "0.16.0", default-features = true, features = ["ws-tokio", "signing"] }
 secp256k1 = { version = "0.20", features = ["recovery"]}
 tokio = { version = "1.8.1", features = ["full"] }
 ethereum_abi = "0.3.0"
