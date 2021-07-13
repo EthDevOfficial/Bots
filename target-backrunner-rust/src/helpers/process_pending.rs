@@ -33,21 +33,8 @@ async fn process_transaction(
                             Some((func, params)) => {
                                 match immutable_state.exchanges[exchange_index].router_type {
                                     Router::Firebird => {
-                                        println!("HIT");
-
-                                        process_firebird_router_params(
-                                            func,
-                                            params,
-                                            transaction.value,
-                                            transaction.gas_price,
-                                            exchange_index,
-                                            immutable_state,
-                                            mutable_state,
-                                        )
-                                        .await
-                                    }
-                                    _ => {
-                                        // process_uniswap_router_params(
+                                        // println!("HIT");
+                                        // process_firebird_router_params(
                                         //     func,
                                         //     params,
                                         //     transaction.value,
@@ -57,14 +44,18 @@ async fn process_transaction(
                                         //     mutable_state,
                                         // )
                                         // .await
-                                        if exchange_index == 3 {
-                                            println!(
-                                                "{}",
-                                                &immutable_state.exchanges[exchange_index].router
-                                            );
-                                            println!("{:?}", func);
-                                            println!("{:?}", params);
-                                        }
+                                    }
+                                    _ => {
+                                        process_uniswap_router_params(
+                                            func,
+                                            params,
+                                            transaction.value,
+                                            transaction.gas_price,
+                                            exchange_index,
+                                            immutable_state,
+                                            mutable_state,
+                                        )
+                                        .await
                                     }
                                 }
                             }
