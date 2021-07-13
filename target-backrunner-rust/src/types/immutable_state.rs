@@ -24,6 +24,7 @@ pub struct ImmutableState {
     pub primary_exchanges: Vec<Exchange>,
     pub secondary_exchanges: Vec<Exchange>,
     pub exchanges: Vec<Exchange>,
+    pub routers: Vec<Exchange>,
     pub inner_tokens: Vec<Token>,
     // pub inner_token_addresses: Vec<String>,
     pub outer_tokens: Vec<Token>,
@@ -42,6 +43,7 @@ impl ImmutableState {
         chain: Chain,
         primary_exchanges: Vec<Exchange>,
         secondary_exchanges: Vec<Exchange>,
+        aggregators: Vec<Exchange>,
         outer_tokens: Vec<Token>,
         inner_tokens: Vec<Token>,
         ignore_addresses: Vec<&str>,
@@ -92,6 +94,18 @@ impl ImmutableState {
             .iter()
             .for_each(|secondary: &Exchange| exchanges.push(secondary.clone()));
 
+        let mut routers: Vec<Exchange> = Vec::new();
+
+        primary_exchanges
+            .iter()
+            .for_each(|primary: &Exchange| routers.push(primary.clone()));
+        secondary_exchanges
+            .iter()
+            .for_each(|secondary: &Exchange| routers.push(secondary.clone()));
+        aggregators
+            .iter()
+            .for_each(|agg: &Exchange| routers.push(agg.clone()));
+
         let simple_multicall = if chain != Chain::Polygon {
             |bundle: Vec<Bytes>| functions::simple_multicall::encode_input(bundle)
         } else {
@@ -120,6 +134,7 @@ impl ImmutableState {
             primary_exchanges: primary_exchanges.clone(),
             secondary_exchanges: secondary_exchanges.clone(),
             exchanges,
+            routers,
             outer_tokens: outer_tokens.clone(),
             // outer_token_addresses: outer_tokens.clone().into_iter().map(|token| token.address).collect(),
             inner_tokens: inner_tokens.clone(),

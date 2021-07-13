@@ -20,6 +20,7 @@ pub async fn load_immutable_state() -> Arc<ImmutableState> {
 
     let primary_exchanges = vec![exchanges.honeyswap];
     let secondary_exchanges = vec![exchanges.swapper, exchanges.baoswap];
+    let aggregators = vec![];
 
     let ignore_tokens = vec![
         "0x4609e9b9c2912dd5b954cbf3a5d7d89ab6c8979d",
@@ -32,6 +33,7 @@ pub async fn load_immutable_state() -> Arc<ImmutableState> {
             Chain::XDai,
             primary_exchanges,
             secondary_exchanges,
+            aggregators,
             outer_tokens,
             inner_tokens,
             ignore_tokens,
