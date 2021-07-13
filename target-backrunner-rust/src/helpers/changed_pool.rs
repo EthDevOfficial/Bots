@@ -45,7 +45,7 @@ async fn process_token_path(
                         let immutable_state_clone = immutable_state.clone();
                         let mutable_state_clone = mutable_state.clone();
                         tokio::spawn(async move {
-                            make_simple_routes(
+                            make_outer_tri_routes(
                                 &token1_h160,
                                 &token2_h160,
                                 gas_price,
