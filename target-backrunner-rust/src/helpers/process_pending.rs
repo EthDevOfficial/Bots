@@ -33,7 +33,6 @@ async fn process_transaction(
                             Some((func, params)) => {
                                 match immutable_state.routers[exchange_index].router_type {
                                     Router::Firebird => {
-                                        println!("HIT");
                                         process_firebird_router_params(
                                             func,
                                             params,
