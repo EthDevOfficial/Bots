@@ -1,4 +1,7 @@
-use crate::helpers::{abi::decode, changed_pool::{process_uniswap_router_params, process_firebird_router_params}};
+use crate::helpers::{
+    abi::decode,
+    changed_pool::{process_firebird_router_params, process_uniswap_router_params},
+};
 use crate::types::enums::Router;
 use crate::types::immutable_state::ImmutableState;
 use crate::types::mutable_state::MutableState;
@@ -42,7 +45,7 @@ async fn process_transaction(
                                             mutable_state,
                                         )
                                         .await
-                                    },
+                                    }
                                     _ => {
                                         // process_uniswap_router_params(
                                         //     func,
@@ -54,10 +57,21 @@ async fn process_transaction(
                                         //     mutable_state,
                                         // )
                                         // .await
+                                        if exchange_index == 3 {
+                                            println!(
+                                                "{}",
+                                                &immutable_state.exchanges[exchange_index].router
+                                            );
+                                            println!("{:?}", func);
+                                            println!("{:?}", params);
+                                        }
                                     }
                                 }
                             }
-                            None => println!("None {:?}", immutable_state.exchanges[exchange_index].router),
+                            None => println!(
+                                "None {:?}",
+                                immutable_state.exchanges[exchange_index].router
+                            ),
                         }
                     }
                 },
