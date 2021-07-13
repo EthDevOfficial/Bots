@@ -8,7 +8,7 @@ use ethabi::{Bytes, Token as Tokenized};
 use std::cmp::min;
 use std::sync::Arc;
 use std::vec::Vec;
-use web3::types::H160;
+use web3::types::{TransactionParameters, H160};
 
 pub async fn make_simple_routes(
     token1: &H160,
@@ -206,6 +206,43 @@ pub async fn make_inner_tri_routes(
     //     let (tx_obj, wallet_index) = make_tri_tx(immutable_state, bundle, mutable_state, gas_price);
     //     send_transaction(immutable_state, mutable_state, wallet_index, tx_obj).await;
     // }
+}
+
+async fn send_routes(
+    routes: Vec<Bytes>,
+    gas_price: U256,
+    make_tx: fn(
+        &Arc<ImmutableState>,
+        Vec<Bytes>,
+        &Arc<MutableState>,
+        U256,
+    ) -> (TransactionParameters, usize),
+    immutable_state: &'static Arc<ImmutableState>,
+    mutable_state: &'static Arc<MutableState>,
+) {
+    for i in (0..routes.len()).step_by(immutable_state.bundle_size) {
+        let bundle = Vec::from(&routes[i..min(i + immutable_state.bundle_size, routes.len())]);
+        tokio::spawn(async move {
+            let (tx_obj, wallet_index) = make_tx(immutable_state, bundle, mutable_state, gas_price);
+            send_transaction(immutable_state, mutable_state, wallet_index, tx_obj).await;
+        });
+    }
+
+    // let txs: Vec<_> = routes
+    //     .iter()
+    //     .enumerate()
+    //     .step_by(immutable_state.bundle_size)
+    //     .map(|(i, _)| {
+    //         let (tx_obj, wallet_index) = make_tx(
+    //             immutable_state,
+    //             Vec::from(&routes[i..min(i + immutable_state.bundle_size, routes.len())]),
+    //             mutable_state,
+    //             gas_price,
+    //         );
+    //         send_transaction(immutable_state, mutable_state, wallet_index, tx_obj)
+    //     })
+    //     .collect();
+    // join_all(txs).await;
 }
 
 fn favor_outer_token<'a>(
