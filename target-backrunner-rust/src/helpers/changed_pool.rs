@@ -45,14 +45,34 @@ async fn process_token_path(
                             mutable_state,
                         );
                         futures::join!(tri_future, simple_future);
+                        // tokio::spawn(async move {
+                        //     make_simple_routes(
+                        //         &token1_h160,
+                        //         &token2_h160,
+                        //         gas_price,
+                        //         exchange_index,
+                        //         &immutable_state.clone(),
+                        //         &mutable_state.clone(),
+                        //     ).await;
+                        // });
+                        // tokio::spawn(async move {
+                        //     make_simple_routes(
+                        //         &token1_h160,
+                        //         &token2_h160,
+                        //         gas_price,
+                        //         exchange_index,
+                        //         &immutable_state.clone(),
+                        //         &mutable_state.clone(),
+                        //     ).await;
+                        // });
                     } else {
                         make_inner_tri_routes(
                             &H160::from_slice(token1.as_bytes()),
                             &H160::from_slice(token2.as_bytes()),
                             gas_price,
                             exchange_index,
-                            immutable_state,
-                            mutable_state,
+                            &immutable_state,
+                            &mutable_state,
                         )
                         .await;
                     }

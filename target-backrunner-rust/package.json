@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "cargo run",
+    "check": "cargo check",
     "format": "cargo fmt",
     "build-copy-push": "npm run pull-deployment-repo && npm run remove-old && npm run copy && npm run push",
     "pull-deployment-repo": "cd ../../target-backrunner-rust-deployment && git pull",
