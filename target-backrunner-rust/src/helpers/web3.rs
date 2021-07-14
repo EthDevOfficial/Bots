@@ -27,7 +27,7 @@ pub fn make_simple_tx(
             to: Some(immutable_state.contract),
             gas_price: Some(gas_price),
             gas: immutable_state.gas_limit.into(),
-            nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
+            // nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
             chain_id: Some(immutable_state.chain_id),
             data: (immutable_state.simple_multicall)(bundle).into(),
             ..Default::default()
@@ -48,7 +48,7 @@ pub fn make_tri_tx(
             to: Some(immutable_state.contract),
             gas_price: Some(gas_price),
             gas: immutable_state.gas_limit.into(),
-            nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
+            // nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
             chain_id: Some(immutable_state.chain_id),
             data: (immutable_state.tri_multicall)(bundle).into(),
             ..Default::default()
@@ -95,7 +95,7 @@ pub async fn send_transaction(
     match result {
         Ok(response) => {
             // looks like this response may need decode to be readable
-            mutable_state.wallets[wallet_index].increment_nonce();
+            // mutable_state.wallets[wallet_index].increment_nonce();
         }
         Err(error) => {
             println!("{}", error);
