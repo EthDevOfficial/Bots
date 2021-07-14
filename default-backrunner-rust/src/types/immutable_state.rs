@@ -7,10 +7,7 @@ use ethabi::Bytes;
 use ethabi_contract::use_contract;
 use std::{env, str::FromStr, vec::Vec};
 use web3::types::H160;
-use web3::{
-    transports::WebSocket,
-    Web3,
-};
+use web3::{transports::WebSocket, Web3};
 
 use_contract!(optimizer, "./abis/optimizerExec.json");
 use optimizer::functions;
@@ -19,22 +16,17 @@ pub struct ImmutableState {
     pub chain: Chain,
     pub chain_id: u64,
     pub web3: Web3<WebSocket>,
-    // pub web3_quick_node: Web3<Http>,
-    // pub web3_infura: Web3<Http>,
     pub primary_exchanges: Vec<Exchange>,
     pub secondary_exchanges: Vec<Exchange>,
     pub exchanges: Vec<Exchange>,
-    pub routers: Vec<Exchange>,
     pub inner_tokens: Vec<Token>,
-    // pub inner_token_addresses: Vec<String>,
-    pub outer_tokens: Vec<Token>,
-    // pub outer_token_addresses: Vec<String>,
-    pub ignore_addresses: Vec<String>,
+    pub outer_token: Token,
     pub contract: H160,
     pub run_tris: bool,
     pub run_simples: bool,
     pub bundle_size: usize,
     pub gas_limit: usize,
+    pub gas_price: U256,
     pub simple_multicall: fn(Vec<Vec<u8>>) -> Vec<u8>,
     pub tri_multicall: fn(Vec<Vec<u8>>) -> Vec<u8>,
 }
@@ -43,22 +35,12 @@ impl ImmutableState {
         chain: Chain,
         primary_exchanges: Vec<Exchange>,
         secondary_exchanges: Vec<Exchange>,
-        aggregators: Vec<Exchange>,
-        outer_tokens: Vec<Token>,
+        outer_token: Token,
         inner_tokens: Vec<Token>,
-        ignore_addresses: Vec<&str>,
     ) -> Self {
         // Web3
         let ws_url = env::var("WS_URL").unwrap_or("ws://34.204.203.210:8546".to_string());
         let web3 = connect_to_node(&ws_url).await.unwrap();
-
-        // let web3_infura = connect_to_node_http(
-        //     "https://polygon-mainnet.infura.io/v3/8883e83b5ecc4d15837b55a135609ed9",
-        // )
-        // .await
-        // .unwrap();
-
-        // let web3_quick_node = connect_to_node_http("https://green-falling-forest.matic.quiknode.pro/").await.unwrap();
 
         // Contracts
         let contract = H160::from_str(
@@ -85,6 +67,12 @@ impl ImmutableState {
             .unwrap_or("1200000".to_string())
             .parse()
             .unwrap();
+
+        let gas_price: U256 =
+            U256::from_dec_str(&env::var("GAS_PRICE").unwrap_or("50".to_string())).unwrap();
+
+        let gas_price = U256::exp10(9).saturating_mul(gas_price);
+
         let mut exchanges: Vec<Exchange> = Vec::new();
 
         primary_exchanges
@@ -93,18 +81,6 @@ impl ImmutableState {
         secondary_exchanges
             .iter()
             .for_each(|secondary: &Exchange| exchanges.push(secondary.clone()));
-
-        let mut routers: Vec<Exchange> = Vec::new();
-
-        primary_exchanges
-            .iter()
-            .for_each(|primary: &Exchange| routers.push(primary.clone()));
-        secondary_exchanges
-            .iter()
-            .for_each(|secondary: &Exchange| routers.push(secondary.clone()));
-        aggregators
-            .iter()
-            .for_each(|agg: &Exchange| routers.push(agg.clone()));
 
         let simple_multicall = if chain != Chain::Polygon {
             |bundle: Vec<Bytes>| functions::simple_multicall::encode_input(bundle)
@@ -129,25 +105,17 @@ impl ImmutableState {
                 .parse()
                 .unwrap(),
             web3,
-            // web3_quick_node,
-            // web3_infura,
             primary_exchanges: primary_exchanges.clone(),
             secondary_exchanges: secondary_exchanges.clone(),
             exchanges,
-            routers,
-            outer_tokens: outer_tokens.clone(),
-            // outer_token_addresses: outer_tokens.clone().into_iter().map(|token| token.address).collect(),
+            outer_token: outer_token.clone(),
             inner_tokens: inner_tokens.clone(),
-            // inner_token_addresses: inner_tokens.clone().into_iter().map(|token| token.address).collect(),
-            ignore_addresses: ignore_addresses
-                .into_iter()
-                .map(|ignore: &str| ignore.to_string())
-                .collect(),
             contract,
             run_simples,
             run_tris,
             bundle_size,
             gas_limit,
+            gas_price,
             simple_multicall,
             tri_multicall,
         }

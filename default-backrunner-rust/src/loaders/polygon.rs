@@ -10,31 +10,19 @@ pub async fn load_immutable_state() -> Arc<ImmutableState> {
     let tokens = Tokens::new();
     let exchanges = Exchanges::new();
 
-    let outer_tokens = vec![tokens.wmatic.clone()];
-    let inner_tokens = vec![
-        tokens.pwings,
-        tokens.weth,
-        tokens.wmatic,
-        tokens.bone,
-        tokens.usdc,
-        tokens.pup,
-    ];
+    let outer_token = tokens.wmatic.clone();
+    let inner_tokens = vec![tokens.weth, tokens.usdc];
 
     let primary_exchanges = vec![exchanges.quickswap, exchanges.jetswap, exchanges.sushiswap];
     let secondary_exchanges = vec![exchanges.dfyn, exchanges.apeswap];
-    let aggregators = vec![exchanges.firebird];
-
-    let ignore_tokens = vec![];
 
     Arc::new(
         ImmutableState::new(
             Chain::Polygon,
             primary_exchanges,
             secondary_exchanges,
-            aggregators,
-            outer_tokens,
+            outer_token,
             inner_tokens,
-            ignore_tokens,
         )
         .await,
     )
