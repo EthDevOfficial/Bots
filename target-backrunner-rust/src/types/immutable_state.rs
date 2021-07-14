@@ -35,6 +35,7 @@ pub struct ImmutableState {
     pub gas_limit: usize,
     pub simple_multicall: fn(Vec<Vec<u8>>) -> Vec<u8>,
     pub tri_multicall: fn(Vec<Vec<u8>>) -> Vec<u8>,
+    pub gas_price_limit: U256,
 }
 impl ImmutableState {
     pub async fn new(
@@ -158,6 +159,10 @@ impl ImmutableState {
             gas_limit,
             simple_multicall,
             tri_multicall,
+            gas_price_limit: U256::from_dec_str(
+                &env::var("GAS_PRICE_LIMIT").unwrap_or("500000000000".to_string()),
+            )
+            .unwrap(),
         }
     }
 }

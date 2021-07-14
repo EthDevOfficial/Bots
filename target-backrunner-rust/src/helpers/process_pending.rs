@@ -88,7 +88,10 @@ pub async fn process_hash(
                 match result_tx_data {
                     Ok(optional_tx_data) => match optional_tx_data {
                         Some(tx_data) => {
-                            process_transaction(tx_data, &immutable_state, &mutable_state).await;
+                            if tx_data.gas_price.lt(&immutable_state.gas_price_limit) {
+                                process_transaction(tx_data, &immutable_state, &mutable_state)
+                                    .await;
+                            }
                         }
                         None => {}
                     },
