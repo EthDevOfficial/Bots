@@ -134,7 +134,7 @@ impl MutableState {
         let mut wallet_index = self.wallet_index.lock().unwrap();
         let to_return = wallet_index.clone();
         if *wallet_index + inc_amount >= self.wallets.len() {
-            *wallet_index = inc_amount; // safely wrap around with min computation
+            *wallet_index = inc_amount - (self.wallets.len() - *wallet_index);
         } else {
             *wallet_index += inc_amount;
         }
