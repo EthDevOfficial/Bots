@@ -321,7 +321,7 @@ fn above_one_trade_threshold(
                 .position(|other_token| other_token.address.as_bytes() == token.as_bytes());
             match token_index {
                 Some(token_index) => {
-                    let token = &immutable_state.inner_tokens[token_index];
+                    let token = &immutable_state.tokens[token_index];
                     match amount {
                         Uint(amount, _) => token.above_trade_threshold(amount),
                         _ => false,
