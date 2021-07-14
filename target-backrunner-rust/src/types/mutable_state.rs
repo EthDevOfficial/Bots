@@ -133,11 +133,7 @@ impl MutableState {
     pub fn increment_wallet_index(&self, inc_amount: usize) -> usize {
         let mut wallet_index = self.wallet_index.lock().unwrap();
         let to_return = wallet_index.clone();
-        if *wallet_index + inc_amount >= self.wallets.len() {
-            *wallet_index = (*wallet_index + inc_amount) % self.wallets.len();
-        } else {
-            *wallet_index += inc_amount;
-        }
+        *wallet_index = (*wallet_index + inc_amount) % self.wallets.len();
         to_return
     }
 }
