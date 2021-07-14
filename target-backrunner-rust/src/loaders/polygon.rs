@@ -12,17 +12,15 @@ pub async fn load_immutable_state() -> Arc<ImmutableState> {
 
     let outer_tokens = vec![tokens.wmatic.clone()];
     let inner_tokens = vec![
+        tokens.usdt,
         tokens.usdc,
         tokens.weth,
         tokens.wbtc,
         tokens.quick,
         tokens.mimatic,
         tokens.dfyn,
-        tokens.usdt,
         tokens.pwings,
-        // tokens.wmatic,
         tokens.bone,
-        // tokens.pup,
     ];
 
     let primary_exchanges = vec![exchanges.quickswap, exchanges.jetswap, exchanges.sushiswap];
