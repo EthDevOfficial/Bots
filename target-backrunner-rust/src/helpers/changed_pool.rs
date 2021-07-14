@@ -316,9 +316,9 @@ fn above_one_trade_threshold(
     match token {
         Address(token) => {
             let token_index = immutable_state
-                .inner_tokens
+                .tokens
                 .iter()
-                .position(|inner_token| inner_token.address.as_bytes() == token.as_bytes());
+                .position(|other_token| other_token.address.as_bytes() == token.as_bytes());
             match token_index {
                 Some(token_index) => {
                     let token = &immutable_state.inner_tokens[token_index];

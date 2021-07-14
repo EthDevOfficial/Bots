@@ -69,7 +69,7 @@ impl Tokens {
             usdc: Token::new("0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", 1000, 1, 6),
             pup: Token::new("0xcFe2cF35D2bDDE84967e67d00aD74237e234CE59", 20, 1, 18),
             dfyn: Token::new("0xC168E40227E4ebD8C1caE80F7a55a4F0e6D66C97", 500, 1, 18),
-            bone: Token::new("0x6bb45cEAC714c52342Ef73ec663479da35934bf7", 20, 1, 18),
+            bone: Token::new("0x6bb45cEAC714c52342Ef73ec663479da35934bf7", 40, 1, 18),
             route: Token::new("0x16ECCfDbb4eE1A85A33f3A9B21175Cd7Ae753dB4", 100, 1, 18),
             titan: Token::new(
                 "0xaAa5B9e6c589642f98a1cDA99B9D024B8407285A",
