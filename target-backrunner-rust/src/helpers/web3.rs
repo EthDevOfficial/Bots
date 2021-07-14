@@ -77,7 +77,7 @@ pub async fn send_transaction(
     let result = immutable_state
         .web3
         .eth()
-        .send_raw_transaction(signed.raw_transaction.clone())
+        .send_raw_transaction(signed.raw_transaction)
         .await;
 
     // let infura_tx = immutable_state
