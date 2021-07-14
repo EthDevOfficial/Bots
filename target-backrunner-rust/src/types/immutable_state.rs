@@ -7,10 +7,7 @@ use ethabi::Bytes;
 use ethabi_contract::use_contract;
 use std::{env, str::FromStr, vec::Vec};
 use web3::types::H160;
-use web3::{
-    transports::WebSocket,
-    Web3,
-};
+use web3::{transports::WebSocket, Web3};
 
 use_contract!(optimizer, "./abis/optimizerExec.json");
 use optimizer::functions;

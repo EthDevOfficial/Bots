@@ -1,4 +1,7 @@
-use crate::helpers::routes::{make_inner_tri_routes, make_outer_tri_routes, make_simple_routes, make_simple_routes_firebird, make_outer_tri_routes_firebird, make_inner_tri_routes_firebird};
+use crate::helpers::routes::{
+    make_inner_tri_routes, make_inner_tri_routes_firebird, make_outer_tri_routes,
+    make_outer_tri_routes_firebird, make_simple_routes, make_simple_routes_firebird,
+};
 use crate::types::immutable_state::ImmutableState;
 use crate::types::mutable_state::MutableState;
 use ethereum_abi::{
@@ -249,10 +252,7 @@ pub async fn process_firebird_router_params(
     immutable_state: &Arc<ImmutableState>,
     mutable_state: &Arc<MutableState>,
 ) {
-
-
-    if function_headers.name == "multihopBatchSwapExactIn"
-    {
+    if function_headers.name == "multihopBatchSwapExactIn" {
         println!("{:?} \n", function_headers);
         println!("{:?}", decoded_parameters);
         // let token_path = &decoded_parameters[0].value;
@@ -276,8 +276,7 @@ pub async fn process_firebird_router_params(
         //     }
         //     _ => (),
         // }
-    } else if function_headers.name == "multihopBatchSwapExactOut"
-    {
+    } else if function_headers.name == "multihopBatchSwapExactOut" {
         println!("{:?} \n", function_headers);
         println!("{:?}", decoded_parameters);
     }

@@ -27,7 +27,7 @@ pub async fn make_simple_routes_firebird(
     // TODO: seperate into 4 blocks
     if should_reverse {
         for i in 0..immutable_state.exchanges.len() {
-            for j in i+1..immutable_state.exchanges.len(){
+            for j in i + 1..immutable_state.exchanges.len() {
                 let away_exchange = &immutable_state.exchanges[i];
                 let return_exchange = &immutable_state.exchanges[j];
                 // (T1, T2, E2) -> (T2, T1, E1)
@@ -37,12 +37,12 @@ pub async fn make_simple_routes_firebird(
                     &away_exchange.router,
                     &return_exchange.router,
                     U256::from(away_exchange.swap_fee + return_exchange.swap_fee),
-                    ));
+                ));
             }
         }
     } else {
         for i in 0..immutable_state.exchanges.len() {
-            for j in i+1..immutable_state.exchanges.len(){
+            for j in i + 1..immutable_state.exchanges.len() {
                 let away_exchange = &immutable_state.exchanges[j];
                 let return_exchange = &immutable_state.exchanges[i];
                 // (T1, T2, E1) -> (T2, T1. E2)
@@ -138,7 +138,6 @@ pub async fn make_simple_routes(
     .await;
 }
 
-
 pub async fn make_outer_tri_routes_firebird(
     token1: &H160,
     token2: &H160,
@@ -163,9 +162,7 @@ pub async fn make_outer_tri_routes_firebird(
                         &other_exchange.router,
                         &other_exchange.router,
                         &other_exchange.router,
-                        U256::from(
-                            other_exchange.swap_fee * 3
-                        ),
+                        U256::from(other_exchange.swap_fee * 3),
                     ));
                 } else {
                     // (T1, T2, E1) -> (T2, InnerT, E2) -> (InnerT, T1, E3)
@@ -176,9 +173,7 @@ pub async fn make_outer_tri_routes_firebird(
                         &other_exchange.router,
                         &other_exchange.router,
                         &other_exchange.router,
-                        U256::from(
-                            other_exchange.swap_fee * 3,
-                        ),
+                        U256::from(other_exchange.swap_fee * 3),
                     ));
                 }
             }
@@ -277,9 +272,7 @@ pub async fn make_inner_tri_routes_firebird(
                     &other_exchange.router,
                     &other_exchange.router,
                     &other_exchange.router,
-                    U256::from(
-                        other_exchange.swap_fee * 3,
-                    ),
+                    U256::from(other_exchange.swap_fee * 3),
                 ));
             }
         }
@@ -294,7 +287,6 @@ pub async fn make_inner_tri_routes_firebird(
     )
     .await;
 }
-
 
 pub async fn make_inner_tri_routes(
     token1: &H160,
@@ -346,18 +338,30 @@ async fn send_routes(
         Vec<Bytes>,
         &Arc<MutableState>,
         U256,
-    ) -> (TransactionParameters, usize),
+    ) -> TransactionParameters,
     immutable_state: &Arc<ImmutableState>,
     mutable_state: &Arc<MutableState>,
 ) {
-    for i in (0..routes.len()).step_by(immutable_state.bundle_size) {
+    let wallet_index =
+        mutable_state.increment_wallet_index(routes.len() / immutable_state.bundle_size + 1);
+    for (wallet_increment, i) in (0..routes.len())
+        .step_by(immutable_state.bundle_size)
+        .enumerate()
+    {
         let bundle = Vec::from(&routes[i..min(i + immutable_state.bundle_size, routes.len())]);
         let immutable_state = immutable_state.clone();
         let mutable_state = mutable_state.clone();
+        let actual_wallet_index = wallet_index + wallet_increment;
+        // let specific_wallet_index =
         tokio::spawn(async move {
-            let (tx_obj, wallet_index) =
-                make_tx(&immutable_state, bundle, &mutable_state, gas_price);
-            send_transaction(&immutable_state, &mutable_state, wallet_index, tx_obj).await;
+            let tx_obj = make_tx(&immutable_state, bundle, &mutable_state, gas_price);
+            send_transaction(
+                &immutable_state,
+                &mutable_state,
+                actual_wallet_index,
+                tx_obj,
+            )
+            .await;
         });
     }
 
