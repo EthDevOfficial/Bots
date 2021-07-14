@@ -358,7 +358,7 @@ async fn send_routes(
             send_transaction(
                 &immutable_state,
                 &mutable_state,
-                wallet_index + wallet_increment,
+                (wallet_index + wallet_increment) % mutable_state.wallets.len(),
                 tx_obj,
             )
             .await;
