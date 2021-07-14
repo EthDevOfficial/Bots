@@ -351,14 +351,12 @@ async fn send_routes(
         let bundle = Vec::from(&routes[i..min(i + immutable_state.bundle_size, routes.len())]);
         let immutable_state = immutable_state.clone();
         let mutable_state = mutable_state.clone();
-        let actual_wallet_index = wallet_index + wallet_increment;
-        // let specific_wallet_index =
         tokio::spawn(async move {
             let tx_obj = make_tx(&immutable_state, bundle, &mutable_state, gas_price);
             send_transaction(
                 &immutable_state,
                 &mutable_state,
-                actual_wallet_index,
+                wallet_index + wallet_increment,
                 tx_obj,
             )
             .await;
