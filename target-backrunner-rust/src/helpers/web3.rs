@@ -89,7 +89,7 @@ pub async fn send_transaction(
     match result {
         Ok(response) => {
             // looks like this response may need decode to be readable
-            mutable_state.wallets[wallet_index].increment_nonce();
+            // mutable_state.wallets[wallet_index].increment_nonce();
         }
         Err(error) => {
             println!("{}", error);
