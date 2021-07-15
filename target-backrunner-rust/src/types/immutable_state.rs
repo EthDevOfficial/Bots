@@ -7,10 +7,7 @@ use ethabi::Bytes;
 use ethabi_contract::use_contract;
 use std::{env, str::FromStr, vec::Vec};
 use web3::types::H160;
-use web3::{
-    transports::WebSocket,
-    Web3,
-};
+use web3::{transports::WebSocket, Web3};
 
 use_contract!(optimizer, "./abis/optimizerExec.json");
 use optimizer::functions;
@@ -28,6 +25,7 @@ pub struct ImmutableState {
     pub inner_tokens: Vec<Token>,
     // pub inner_token_addresses: Vec<String>,
     pub outer_tokens: Vec<Token>,
+    pub tokens: Vec<Token>,
     // pub outer_token_addresses: Vec<String>,
     pub ignore_addresses: Vec<String>,
     pub contract: H160,
@@ -37,6 +35,7 @@ pub struct ImmutableState {
     pub gas_limit: usize,
     pub simple_multicall: fn(Vec<Vec<u8>>) -> Vec<u8>,
     pub tri_multicall: fn(Vec<Vec<u8>>) -> Vec<u8>,
+    pub gas_price_limit: U256,
 }
 impl ImmutableState {
     pub async fn new(
@@ -66,6 +65,15 @@ impl ImmutableState {
                 .unwrap_or("0x6E8a22e28A92f47CE1CE76a26dE691802A25ca85".to_string()),
         )
         .unwrap();
+
+        let mut tokens: Vec<Token> = Vec::new();
+
+        outer_tokens
+            .iter()
+            .for_each(|token| tokens.push(token.clone()));
+        inner_tokens
+            .iter()
+            .for_each(|token| tokens.push(token.clone()));
 
         // Routing
         let run_simples: bool = env::var("RUN_SIMPLES")
@@ -138,6 +146,7 @@ impl ImmutableState {
             outer_tokens: outer_tokens.clone(),
             // outer_token_addresses: outer_tokens.clone().into_iter().map(|token| token.address).collect(),
             inner_tokens: inner_tokens.clone(),
+            tokens,
             // inner_token_addresses: inner_tokens.clone().into_iter().map(|token| token.address).collect(),
             ignore_addresses: ignore_addresses
                 .into_iter()
@@ -150,6 +159,10 @@ impl ImmutableState {
             gas_limit,
             simple_multicall,
             tri_multicall,
+            gas_price_limit: U256::from_dec_str(
+                &env::var("GAS_PRICE_LIMIT").unwrap_or("500000000000".to_string()),
+            )
+            .unwrap(),
         }
     }
 }

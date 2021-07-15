@@ -1,7 +1,4 @@
-use crate::helpers::{
-    abi::decode,
-    changed_pool::{process_firebird_router_params, process_uniswap_router_params},
-};
+use crate::helpers::{abi::decode, changed_pool::process_uniswap_router_params};
 use crate::types::enums::Router;
 use crate::types::immutable_state::ImmutableState;
 use crate::types::mutable_state::MutableState;
@@ -88,7 +85,10 @@ pub async fn process_hash(
                 match result_tx_data {
                     Ok(optional_tx_data) => match optional_tx_data {
                         Some(tx_data) => {
-                            process_transaction(tx_data, &immutable_state, &mutable_state).await;
+                            if tx_data.gas_price.lt(&immutable_state.gas_price_limit) {
+                                process_transaction(tx_data, &immutable_state, &mutable_state)
+                                    .await;
+                            }
                         }
                         None => {}
                     },

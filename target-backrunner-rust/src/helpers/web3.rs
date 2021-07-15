@@ -19,21 +19,18 @@ pub fn make_simple_tx(
     bundle: Vec<Bytes>,
     mutable_state: &Arc<MutableState>,
     gas_price: U256,
-) -> (TransactionParameters, usize) {
-    let wallet_index = mutable_state.increment_wallet_index();
+) -> TransactionParameters {
+    // let wallet_index = mutable_state.increment_wallet_index();
 
-    (
-        TransactionParameters {
-            to: Some(immutable_state.contract),
-            gas_price: Some(gas_price),
-            gas: immutable_state.gas_limit.into(),
-            // nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
-            chain_id: Some(immutable_state.chain_id),
-            data: (immutable_state.simple_multicall)(bundle).into(),
-            ..Default::default()
-        },
-        wallet_index,
-    )
+    TransactionParameters {
+        to: Some(immutable_state.contract),
+        gas_price: Some(gas_price),
+        gas: immutable_state.gas_limit.into(),
+        // nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
+        chain_id: Some(immutable_state.chain_id),
+        data: (immutable_state.simple_multicall)(bundle).into(),
+        ..Default::default()
+    }
 }
 
 pub fn make_tri_tx(
@@ -41,20 +38,17 @@ pub fn make_tri_tx(
     bundle: Vec<Bytes>,
     mutable_state: &Arc<MutableState>,
     gas_price: U256,
-) -> (TransactionParameters, usize) {
-    let wallet_index = mutable_state.increment_wallet_index();
-    (
-        TransactionParameters {
-            to: Some(immutable_state.contract),
-            gas_price: Some(gas_price),
-            gas: immutable_state.gas_limit.into(),
-            // nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
-            chain_id: Some(immutable_state.chain_id),
-            data: (immutable_state.tri_multicall)(bundle).into(),
-            ..Default::default()
-        },
-        wallet_index,
-    )
+) -> TransactionParameters {
+    // let wallet_index = mutable_state.increment_wallet_index();
+    TransactionParameters {
+        to: Some(immutable_state.contract),
+        gas_price: Some(gas_price),
+        gas: immutable_state.gas_limit.into(),
+        // nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
+        chain_id: Some(immutable_state.chain_id),
+        data: (immutable_state.tri_multicall)(bundle).into(),
+        ..Default::default()
+    }
 }
 
 #[allow(unused_must_use)]
