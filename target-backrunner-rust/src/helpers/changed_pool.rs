@@ -1,4 +1,4 @@
-use crate::helpers::routes::{make_inner_tri_routes, make_outer_tri_routes, make_simple_routes};
+use crate::helpers::routes::{make_inner_tri_routes, make_outer_tri_routes, make_simple_routes, make_outer_quad_routes, make_inner_quad_routes};
 use crate::types::immutable_state::ImmutableState;
 use crate::types::mutable_state::MutableState;
 use ethereum_abi::{
@@ -55,6 +55,20 @@ async fn process_token_path(
                             )
                             .await;
                         });
+
+                        let immutable_state_clone = immutable_state.clone();
+                        let mutable_state_clone = mutable_state.clone();
+                        tokio::spawn(async move {
+                            make_outer_quad_routes(
+                                &token1_h160,
+                                &token2_h160,
+                                gas_price,
+                                exchange_index,
+                                &immutable_state_clone,
+                                &mutable_state_clone,
+                            )
+                            .await;
+                        });
                         // let simple_future = make_simple_routes(
                         //     &token1_h160,
                         //     &token2_h160,
@@ -83,6 +97,27 @@ async fn process_token_path(
                             &mutable_state,
                         )
                         .await;
+                        if i + 2 <= token_path.len() - 1 {
+                            match token_path[i + 2] {
+                                Address(token3) => {
+                                    if immutable_state.outer_tokens.iter().any(|token| {
+                                        token.address.as_bytes() == token3.as_bytes()
+                                    }) {
+                                        make_inner_quad_routes(
+                                            &H160::from_slice(token1.as_bytes()),
+                                            &H160::from_slice(token2.as_bytes()),
+                                            &H160::from_slice(token3.as_bytes()),
+                                            gas_price,
+                                            exchange_index,
+                                            &immutable_state,
+                                            &mutable_state,
+                                        )
+                                        .await;
+                                    }
+                                },
+                                _ => ()
+                            }
+                        }
                     }
                 }
                 _ => {}
