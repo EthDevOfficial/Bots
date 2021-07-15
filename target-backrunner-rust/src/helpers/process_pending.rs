@@ -1,7 +1,4 @@
-use crate::helpers::{
-    abi::decode,
-    changed_pool::{process_firebird_router_params, process_uniswap_router_params},
-};
+use crate::helpers::{abi::decode, changed_pool::process_uniswap_router_params};
 use crate::types::enums::Router;
 use crate::types::immutable_state::ImmutableState;
 use crate::types::mutable_state::MutableState;

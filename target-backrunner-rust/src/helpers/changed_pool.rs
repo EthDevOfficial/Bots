@@ -1,7 +1,4 @@
-use crate::helpers::routes::{
-    make_inner_tri_routes, make_inner_tri_routes_firebird, make_outer_tri_routes,
-    make_outer_tri_routes_firebird, make_simple_routes, make_simple_routes_firebird,
-};
+use crate::helpers::routes::{make_inner_tri_routes, make_outer_tri_routes, make_simple_routes};
 use crate::types::immutable_state::ImmutableState;
 use crate::types::mutable_state::MutableState;
 use ethereum_abi::{
@@ -12,66 +9,6 @@ use futures;
 use primitive_types::U256;
 use std::sync::Arc;
 use web3::types::{H160, U256 as Web3U256};
-
-async fn process_token_path_firebird(
-    token_path: &Vec<Value>,
-    gas_price: Web3U256,
-    immutable_state: &Arc<ImmutableState>,
-    mutable_state: &Arc<MutableState>,
-) {
-    for i in 0..(token_path.len() - 1) {
-        match token_path[i] {
-            Address(token1) => match token_path[i + 1] {
-                Address(token2) => {
-                    if immutable_state.outer_tokens.iter().any(|token| {
-                        token.address.as_bytes() == token1.as_bytes()
-                            || token.address.as_bytes() == token2.as_bytes()
-                    }) {
-                        let token1_h160 = H160::from_slice(token1.as_bytes());
-                        let token2_h160 = H160::from_slice(token2.as_bytes());
-
-                        let immutable_state_clone = immutable_state.clone();
-                        let mutable_state_clone = mutable_state.clone();
-                        tokio::spawn(async move {
-                            make_simple_routes_firebird(
-                                &token1_h160,
-                                &token2_h160,
-                                gas_price,
-                                &immutable_state_clone,
-                                &mutable_state_clone,
-                            )
-                            .await;
-                        });
-
-                        let immutable_state_clone = immutable_state.clone();
-                        let mutable_state_clone = mutable_state.clone();
-                        tokio::spawn(async move {
-                            make_outer_tri_routes_firebird(
-                                &token1_h160,
-                                &token2_h160,
-                                gas_price,
-                                &immutable_state_clone,
-                                &mutable_state_clone,
-                            )
-                            .await;
-                        });
-                    } else {
-                        make_inner_tri_routes_firebird(
-                            &H160::from_slice(token1.as_bytes()),
-                            &H160::from_slice(token2.as_bytes()),
-                            gas_price,
-                            &immutable_state,
-                            &mutable_state,
-                        )
-                        .await;
-                    }
-                }
-                _ => {}
-            },
-            _ => {}
-        }
-    }
-}
 
 async fn process_token_path(
     token_path: &Vec<Value>,
@@ -244,44 +181,6 @@ pub async fn process_uniswap_router_params(
     }
 }
 
-pub async fn process_firebird_router_params(
-    function_headers: &Function,
-    decoded_parameters: DecodedParams,
-    tx_value: Web3U256,
-    gas_price: Web3U256,
-    immutable_state: &Arc<ImmutableState>,
-    mutable_state: &Arc<MutableState>,
-) {
-    if function_headers.name == "multihopBatchSwapExactIn" {
-        println!("{:?} \n", function_headers);
-        println!("{:?}", decoded_parameters);
-        // let token_path = &decoded_parameters[0].value;
-        // match token_path {
-        //     Array(token_path, _) => {
-        //         if above_trade_threshold(
-        //             &token_path[0],
-        //             &token_path[token_path.len() - 1],
-        //             &decoded_parameters[0].value,
-        //             &decoded_parameters[1].value,
-        //             immutable_state,
-        //         ) {
-        //             process_token_path_firebird(
-        //                 token_path,
-        //                 gas_price,
-        //                 immutable_state,
-        //                 mutable_state,
-        //             )
-        //             .await;
-        //         }
-        //     }
-        //     _ => (),
-        // }
-    } else if function_headers.name == "multihopBatchSwapExactOut" {
-        println!("{:?} \n", function_headers);
-        println!("{:?}", decoded_parameters);
-    }
-}
-
 pub fn above_trade_threshold(
     in_token: &Value,
     out_token: &Value,
@@ -333,3 +232,103 @@ fn above_one_trade_threshold(
         _ => false,
     }
 }
+
+// =============================== //
+
+// pub async fn process_firebird_router_params(
+//     function_headers: &Function,
+//     decoded_parameters: DecodedParams,
+//     tx_value: Web3U256,
+//     gas_price: Web3U256,
+//     immutable_state: &Arc<ImmutableState>,
+//     mutable_state: &Arc<MutableState>,
+// ) {
+//     if function_headers.name == "multihopBatchSwapExactIn" {
+//         println!("{:?} \n", function_headers);
+//         println!("{:?}", decoded_parameters);
+//         // let token_path = &decoded_parameters[0].value;
+//         // match token_path {
+//         //     Array(token_path, _) => {
+//         //         if above_trade_threshold(
+//         //             &token_path[0],
+//         //             &token_path[token_path.len() - 1],
+//         //             &decoded_parameters[0].value,
+//         //             &decoded_parameters[1].value,
+//         //             immutable_state,
+//         //         ) {
+//         //             process_token_path_firebird(
+//         //                 token_path,
+//         //                 gas_price,
+//         //                 immutable_state,
+//         //                 mutable_state,
+//         //             )
+//         //             .await;
+//         //         }
+//         //     }
+//         //     _ => (),
+//         // }
+//     } else if function_headers.name == "multihopBatchSwapExactOut" {
+//         println!("{:?} \n", function_headers);
+//         println!("{:?}", decoded_parameters);
+//     }
+// }
+
+// async fn process_token_path_firebird(
+//     token_path: &Vec<Value>,
+//     gas_price: Web3U256,
+//     immutable_state: &Arc<ImmutableState>,
+//     mutable_state: &Arc<MutableState>,
+// ) {
+//     for i in 0..(token_path.len() - 1) {
+//         match token_path[i] {
+//             Address(token1) => match token_path[i + 1] {
+//                 Address(token2) => {
+//                     if immutable_state.outer_tokens.iter().any(|token| {
+//                         token.address.as_bytes() == token1.as_bytes()
+//                             || token.address.as_bytes() == token2.as_bytes()
+//                     }) {
+//                         let token1_h160 = H160::from_slice(token1.as_bytes());
+//                         let token2_h160 = H160::from_slice(token2.as_bytes());
+
+//                         let immutable_state_clone = immutable_state.clone();
+//                         let mutable_state_clone = mutable_state.clone();
+//                         tokio::spawn(async move {
+//                             make_simple_routes_firebird(
+//                                 &token1_h160,
+//                                 &token2_h160,
+//                                 gas_price,
+//                                 &immutable_state_clone,
+//                                 &mutable_state_clone,
+//                             )
+//                             .await;
+//                         });
+
+//                         let immutable_state_clone = immutable_state.clone();
+//                         let mutable_state_clone = mutable_state.clone();
+//                         tokio::spawn(async move {
+//                             make_outer_tri_routes_firebird(
+//                                 &token1_h160,
+//                                 &token2_h160,
+//                                 gas_price,
+//                                 &immutable_state_clone,
+//                                 &mutable_state_clone,
+//                             )
+//                             .await;
+//                         });
+//                     } else {
+//                         make_inner_tri_routes_firebird(
+//                             &H160::from_slice(token1.as_bytes()),
+//                             &H160::from_slice(token2.as_bytes()),
+//                             gas_price,
+//                             &immutable_state,
+//                             &mutable_state,
+//                         )
+//                         .await;
+//                     }
+//                 }
+//                 _ => {}
+//             },
+//             _ => {}
+//         }
+//     }
+// }
