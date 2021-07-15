@@ -12,9 +12,9 @@ pub async fn load_immutable_state() -> Arc<ImmutableState> {
 
     let outer_tokens = vec![tokens.wftm.clone()];
     let inner_tokens = vec![
-        tokens.fusd,
         tokens.usdc,
         tokens.weth,
+        tokens.fusd,
         tokens.fbtc,
         tokens.aave,
         tokens.dai,
