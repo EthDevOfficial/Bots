@@ -14,11 +14,9 @@ pub async fn load_immutable_state() -> Arc<ImmutableState> {
     let inner_tokens = vec![
         tokens.usdc,
         tokens.weth,
-        tokens.fusd,
-        tokens.fbtc,
-        tokens.aave,
+        tokens.boo,
+        tokens.spirit,
         tokens.dai,
-        tokens.curve,
     ];
 
     let primary_exchanges = vec![exchanges.spirit, exchanges.spooky];
@@ -29,7 +27,7 @@ pub async fn load_immutable_state() -> Arc<ImmutableState> {
 
     Arc::new(
         ImmutableState::new(
-            Chain::Polygon,
+            Chain::Fantom,
             primary_exchanges,
             secondary_exchanges,
             aggregators,
@@ -50,6 +48,8 @@ struct Tokens {
     aave: Token,
     dai: Token,
     curve: Token,
+    spirit: Token,
+    boo: Token
 }
 impl Tokens {
     pub fn new() -> Tokens {
@@ -62,6 +62,8 @@ impl Tokens {
             aave: Token::new("0x6a07A792ab2965C72a5B8088d3a069A7aC3a993B", 3, 1, 18),
             dai: Token::new("0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E", 1000, 1, 18),
             curve: Token::new("0x1E4F97b9f9F913c46F1632781732927B9019C68b", 700, 1, 18),
+            spirit: Token::new("0x5Cc61A78F164885776AA610fb0FE1257df78E59B", 30000, 1, 18),
+            boo: Token::new("0x841FAD6EAe12c286d1Fd18d1d525DFfA75C7EFFE", 300, 1, 18)
         }
     }
 }
