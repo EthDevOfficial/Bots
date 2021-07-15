@@ -203,41 +203,39 @@ pub async fn make_outer_tri_routes(
 
     // Token1 is preferred
     let mut routes: Vec<Bytes> = Vec::new();
-    for other_exchange1 in immutable_state.exchanges.iter() {
-        for other_exchange2 in immutable_state.exchanges.iter() {
-            for inner_token in immutable_state.inner_tokens.iter() {
-                if token2.ne(&inner_token.address) {
-                    if should_reverse {
-                        // (T1, InnerT, E3) -> (InnerT, T2, E2) -> (T2, T1, E1)
-                        routes.push(tokenize_tri(
-                            token1,
-                            &inner_token.address,
-                            token2,
-                            &other_exchange1.router,
-                            &other_exchange2.router,
-                            &immutable_state.exchanges[exchange_index].router,
-                            U256::from(
-                                other_exchange1.swap_fee
-                                    + other_exchange2.swap_fee
-                                    + immutable_state.exchanges[exchange_index].swap_fee,
-                            ),
-                        ));
-                    } else {
-                        // (T1, T2, E1) -> (T2, InnerT, E2) -> (InnerT, T1, E3)
-                        routes.push(tokenize_tri(
-                            token1,
-                            token2,
-                            &inner_token.address,
-                            &immutable_state.exchanges[exchange_index].router,
-                            &other_exchange1.router,
-                            &other_exchange2.router,
-                            U256::from(
-                                other_exchange1.swap_fee
-                                    + other_exchange2.swap_fee
-                                    + immutable_state.exchanges[exchange_index].swap_fee,
-                            ),
-                        ));
-                    }
+    for other_exchange in immutable_state.exchanges.iter() {
+        for inner_token in immutable_state.inner_tokens.iter() {
+            if token2.ne(&inner_token.address) {
+                if should_reverse {
+                    // (T1, InnerT, E3) -> (InnerT, T2, E2) -> (T2, T1, E1)
+                    routes.push(tokenize_tri(
+                        token1,
+                        &inner_token.address,
+                        token2,
+                        &other_exchange.router,
+                        &other_exchange.router,
+                        &immutable_state.exchanges[exchange_index].router,
+                        U256::from(
+                            other_exchange.swap_fee
+                                + other_exchange.swap_fee
+                                + immutable_state.exchanges[exchange_index].swap_fee,
+                        ),
+                    ));
+                } else {
+                    // (T1, T2, E1) -> (T2, InnerT, E2) -> (InnerT, T1, E3)
+                    routes.push(tokenize_tri(
+                        token1,
+                        token2,
+                        &inner_token.address,
+                        &immutable_state.exchanges[exchange_index].router,
+                        &other_exchange.router,
+                        &other_exchange.router,
+                        U256::from(
+                            other_exchange.swap_fee
+                                + other_exchange.swap_fee
+                                + immutable_state.exchanges[exchange_index].swap_fee,
+                        ),
+                    ));
                 }
             }
         }
