@@ -1,7 +1,7 @@
 use crate::types::immutable_state::ImmutableState;
 use crate::types::mutable_state::MutableState;
 use std::{env, sync::Arc};
-// mod fantom;
+mod fantom;
 mod polygon;
 mod xdai;
 
@@ -12,8 +12,8 @@ pub async fn load_immutable_state() -> Arc<ImmutableState> {
         xdai::load_immutable_state().await
     } else if chain == "polygon" {
         polygon::load_immutable_state().await
-    // } else if chain == "fantom" {
-    //     fantom::load_immutable_state(ws).await
+    } else if chain == "fantom" {
+        fantom::load_immutable_state().await
     } else {
         panic!("Loader couldn't interpret the correct chain. Check the env")
     }
