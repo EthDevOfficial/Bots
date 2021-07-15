@@ -35,6 +35,7 @@ pub struct ImmutableState {
     pub gas_limit: usize,
     pub simple_multicall: fn(Vec<Vec<u8>>) -> Vec<u8>,
     pub tri_multicall: fn(Vec<Vec<u8>>) -> Vec<u8>,
+    pub quad_multicall: fn(Vec<Vec<u8>>) -> Vec<u8>,
     pub gas_price_limit: U256,
 }
 impl ImmutableState {
@@ -126,6 +127,12 @@ impl ImmutableState {
             |bundle: Vec<Bytes>| functions::tri_multicall_chi::encode_input(bundle)
         };
 
+        let quad_multicall = if chain != Chain::Polygon {
+            |bundle: Vec<Bytes>| functions::quad_multicall::encode_input(bundle)
+        } else {
+            |bundle: Vec<Bytes>| functions::quad_multicall_chi::encode_input(bundle)
+        };
+
         ImmutableState {
             chain,
             chain_id: web3
@@ -144,10 +151,8 @@ impl ImmutableState {
             exchanges,
             routers,
             outer_tokens: outer_tokens.clone(),
-            // outer_token_addresses: outer_tokens.clone().into_iter().map(|token| token.address).collect(),
             inner_tokens: inner_tokens.clone(),
             tokens,
-            // inner_token_addresses: inner_tokens.clone().into_iter().map(|token| token.address).collect(),
             ignore_addresses: ignore_addresses
                 .into_iter()
                 .map(|ignore: &str| ignore.to_string())
@@ -159,6 +164,7 @@ impl ImmutableState {
             gas_limit,
             simple_multicall,
             tri_multicall,
+            quad_multicall,
             gas_price_limit: U256::from_dec_str(
                 &env::var("GAS_PRICE_LIMIT").unwrap_or("500000000000".to_string()),
             )

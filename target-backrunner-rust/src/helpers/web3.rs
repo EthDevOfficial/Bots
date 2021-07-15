@@ -51,6 +51,24 @@ pub fn make_tri_tx(
     }
 }
 
+pub fn make_quad_tx(
+    immutable_state: &Arc<ImmutableState>,
+    bundle: Vec<Bytes>,
+    mutable_state: &Arc<MutableState>,
+    gas_price: U256,
+) -> TransactionParameters {
+    // let wallet_index = mutable_state.increment_wallet_index();
+    TransactionParameters {
+        to: Some(immutable_state.contract),
+        gas_price: Some(gas_price),
+        gas: immutable_state.gas_limit.into(),
+        // nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
+        chain_id: Some(immutable_state.chain_id),
+        data: (immutable_state.quad_multicall)(bundle).into(),
+        ..Default::default()
+    }
+}
+
 #[allow(unused_must_use)]
 pub async fn send_transaction(
     immutable_state: &Arc<ImmutableState>,

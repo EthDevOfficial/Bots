@@ -44,3 +44,27 @@ pub fn tokenize_tri(
         Uint(swap_fee_sum),
     ])
 }
+
+pub fn tokenize_quad(
+    token1: &H160,
+    token2: &H160,
+    token3: &H160,
+    token4: &H160,
+    ex1: &H160,
+    ex2: &H160,
+    ex3: &H160,
+    ex4: &H160,
+    swap_fee_sum: U256,
+) -> Bytes {
+    encode(&[
+        Address(token1.clone()),
+        Address(token2.clone()),
+        Address(token3.clone()),
+        Address(token4.clone()),
+        Address(ex1.clone()),
+        Address(ex2.clone()),
+        Address(ex3.clone()),
+        Address(ex4.clone()),
+        Uint(swap_fee_sum),
+    ])
+}

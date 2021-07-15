@@ -11,6 +11,8 @@ use std::sync::Arc;
 use std::vec::Vec;
 use web3::types::{TransactionParameters, H160};
 
+use super::encoder::tokenize_quad;
+
 pub async fn make_simple_routes(
     token1: &H160,
     token2: &H160,
@@ -155,7 +157,6 @@ pub async fn make_inner_tri_routes(
     let mut routes: Vec<Bytes> = Vec::new();
     for other_exchange in immutable_state.exchanges.iter() {
         for outer_token in immutable_state.outer_tokens.iter() {
-            // if token1.ne(&outer_token.address) && token2.ne(&outer_token.address) {
             // We want to reverse
             // (OuterT, T2 E3) -> (T2, T1, E2) -> (T1, OuterT, E1)
             routes.push(tokenize_tri(
@@ -171,7 +172,115 @@ pub async fn make_inner_tri_routes(
                         + immutable_state.exchanges[exchange_index].swap_fee,
                 ),
             ));
-            // }
+        }
+    }
+
+    send_routes(
+        routes,
+        gas_price,
+        make_tri_tx,
+        immutable_state,
+        mutable_state,
+    )
+    .await;
+}
+
+pub async fn make_outer_quad_routes(
+    token1: &H160,
+    token2: &H160,
+    gas_price: U256,
+    exchange_index: usize,
+    immutable_state: &Arc<ImmutableState>,
+    mutable_state: &Arc<MutableState>,
+) {
+    // Find the correct pool ordering and record whether the route should be reversed
+    let (token1, token2, should_reverse) = favor_outer_token(token1, token2, &immutable_state);
+
+    // Token1 is preferred
+    let mut routes: Vec<Bytes> = Vec::new();
+    for other_exchange in immutable_state.exchanges.iter() {
+        for inner_token1 in immutable_state.inner_tokens.iter() {
+            for inner_token2 in immutable_state.inner_tokens.iter() {
+                if token2.ne(&inner_token1.address)
+                    && inner_token1.address.ne(&inner_token2.address)
+                {
+                    if should_reverse {
+                        // (T1, InnerT2, E4) -> (InnerT2, InnerT1, E3) -> (InnerT1, T2, E2) -> (T2, T1, E1)
+                        routes.push(tokenize_quad(
+                            token1,
+                            &inner_token2.address,
+                            &inner_token1.address,
+                            token2,
+                            &other_exchange.router,
+                            &other_exchange.router,
+                            &other_exchange.router,
+                            &immutable_state.exchanges[exchange_index].router,
+                            U256::from(
+                                (other_exchange.swap_fee * 3)
+                                    + immutable_state.exchanges[exchange_index].swap_fee,
+                            ),
+                        ));
+                    } else {
+                        // (T1, T2, E1) -> (T2, InnerT1, E2) -> (InnerT1, InnerT2, E3) -> (InnerT2, T1, E4)
+                        routes.push(tokenize_quad(
+                            token1,
+                            token2,
+                            &inner_token1.address,
+                            &inner_token2.address,
+                            &immutable_state.exchanges[exchange_index].router,
+                            &other_exchange.router,
+                            &other_exchange.router,
+                            &other_exchange.router,
+                            U256::from(
+                                (other_exchange.swap_fee * 3)
+                                    + immutable_state.exchanges[exchange_index].swap_fee,
+                            ),
+                        ));
+                    }
+                }
+            }
+        }
+    }
+
+    send_routes(
+        routes,
+        gas_price,
+        make_tri_tx,
+        immutable_state,
+        mutable_state,
+    )
+    .await;
+}
+
+pub async fn make_inner_quad_routes(
+    token1: &H160,
+    token2: &H160,
+    token3: &H160,
+    gas_price: U256,
+    exchange_index: usize,
+    immutable_state: &Arc<ImmutableState>,
+    mutable_state: &Arc<MutableState>,
+) {
+    // In original ordering (no outer token)
+    let mut routes: Vec<Bytes> = Vec::new();
+    for other_exchange in immutable_state.exchanges.iter() {
+        for outer_token in immutable_state.outer_tokens.iter() {
+            // We want to reverse
+            // (OuterT, T3 E4) -> (T3, T2, E3) -> (T2, T1, E2) -> (T1, OuterT, E1)
+            routes.push(tokenize_quad(
+                &outer_token.address,
+                token3,
+                token2,
+                token1,
+                &other_exchange.router,
+                &immutable_state.exchanges[exchange_index].router,
+                &immutable_state.exchanges[exchange_index].router,
+                &other_exchange.router,
+                U256::from(
+                    (other_exchange.swap_fee * 2)
+                        + (immutable_state.exchanges[exchange_index].swap_fee * 2),
+                ),
+            ));
         }
     }
 
