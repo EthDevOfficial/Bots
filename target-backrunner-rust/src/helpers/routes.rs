@@ -72,14 +72,14 @@ pub async fn make_simple_routes(
         }
     };
 
-    send_routes(
-        routes,
-        gas_price,
-        make_simple_tx,
-        immutable_state,
-        mutable_state,
-    )
-    .await;
+    // send_routes(
+    //     routes,
+    //     gas_price,
+    //     make_simple_tx,
+    //     immutable_state,
+    //     mutable_state,
+    // )
+    // .await;
 }
 
 pub async fn make_outer_tri_routes(
@@ -133,14 +133,14 @@ pub async fn make_outer_tri_routes(
         }
     }
 
-    send_routes(
-        routes,
-        gas_price,
-        make_tri_tx,
-        immutable_state,
-        mutable_state,
-    )
-    .await;
+    // send_routes(
+    //     routes,
+    //     gas_price,
+    //     make_tri_tx,
+    //     immutable_state,
+    //     mutable_state,
+    // )
+    // .await;
 }
 
 pub async fn make_inner_tri_routes(
@@ -175,22 +175,22 @@ pub async fn make_inner_tri_routes(
         }
     }
 
-    send_routes(
-        routes,
-        gas_price,
-        make_tri_tx,
-        immutable_state,
-        mutable_state,
-    )
-    .await;
+    // send_routes(
+    //     routes,
+    //     gas_price,
+    //     make_tri_tx,
+    //     immutable_state,
+    //     mutable_state,
+    // )
+    // .await;
 }
 
-async fn send_routes(
-    routes: Vec<Bytes>,
+pub async fn send_routes(
+    routes: Vec<(String, String)>,
     gas_price: U256,
     make_tx: fn(
         &Arc<ImmutableState>,
-        Vec<Bytes>,
+        Vec<(String, String)>,
         &Arc<MutableState>,
         U256,
     ) -> TransactionParameters,

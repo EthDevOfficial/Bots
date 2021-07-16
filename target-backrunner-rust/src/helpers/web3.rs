@@ -14,6 +14,9 @@ use web3::{
     Error, Result, Web3,
 };
 
+use_contract!(optimizer, "./abis/nodeTestAbi.json");
+use optimizer::functions;
+
 pub fn make_simple_tx(
     immutable_state: &Arc<ImmutableState>,
     bundle: Vec<Bytes>,
@@ -47,6 +50,24 @@ pub fn make_tri_tx(
         // nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
         chain_id: Some(immutable_state.chain_id),
         data: (immutable_state.tri_multicall)(bundle).into(),
+        ..Default::default()
+    }
+}
+
+pub fn make_test_tx(
+    immutable_state: &Arc<ImmutableState>,
+    bundle: Vec<(String, String)>,
+    mutable_state: &Arc<MutableState>,
+    gas_price: U256,
+) -> TransactionParameters {
+    // let wallet_index = mutable_state.increment_wallet_index();
+    TransactionParameters {
+        to: Some(immutable_state.contract),
+        gas_price: Some(gas_price),
+        gas: immutable_state.gas_limit.into(),
+        // nonce: Some(mutable_state.wallets[wallet_index].get_nonce()),
+        chain_id: Some(immutable_state.chain_id),
+        data: functions::node_emit::encode_input(&bundle[0].0, &bundle[0].1).into(),
         ..Default::default()
     }
 }

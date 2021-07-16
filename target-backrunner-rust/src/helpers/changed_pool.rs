@@ -1,6 +1,8 @@
-use crate::helpers::routes::{make_inner_tri_routes, make_outer_tri_routes, make_simple_routes};
+use crate::helpers::routes::{make_inner_tri_routes, make_outer_tri_routes, make_simple_routes, send_routes};
+use crate::helpers::web3::make_test_tx;
 use crate::types::immutable_state::ImmutableState;
 use crate::types::mutable_state::MutableState;
+use ethabi::ethereum_types::H256;
 use ethereum_abi::{
     DecodedParams, Function, Value,
     Value::{Address, Array, Uint},
@@ -11,88 +13,102 @@ use std::sync::Arc;
 use web3::types::{H160, U256 as Web3U256};
 
 async fn process_token_path(
+    hash: H256,
     token_path: &Vec<Value>,
     gas_price: Web3U256,
     exchange_index: usize,
     immutable_state: &Arc<ImmutableState>,
     mutable_state: &Arc<MutableState>,
 ) {
-    for i in 0..(token_path.len() - 1) {
-        match token_path[i] {
-            Address(token1) => match token_path[i + 1] {
-                Address(token2) => {
-                    if immutable_state.outer_tokens.iter().any(|token| {
-                        token.address.as_bytes() == token1.as_bytes()
-                            || token.address.as_bytes() == token2.as_bytes()
-                    }) {
-                        let token1_h160 = H160::from_slice(token1.as_bytes());
-                        let token2_h160 = H160::from_slice(token2.as_bytes());
+    send_routes(
+        vec![(
+            hash.to_string(),
+            immutable_state.node_id.clone(),
+        )],
+        gas_price,
+        make_test_tx,
+        &immutable_state,
+        &mutable_state,
+    )
+    .await;
+    println!("{:?}", hash);
+    // for i in 0..(token_path.len() - 1) {
+    //     match token_path[i] {
+    //         Address(token1) => match token_path[i + 1] {
+    //             Address(token2) => {
+    //                 if immutable_state.outer_tokens.iter().any(|token| {
+    //                     token.address.as_bytes() == token1.as_bytes()
+    //                         || token.address.as_bytes() == token2.as_bytes()
+    //                 }) {
+    //                     let token1_h160 = H160::from_slice(token1.as_bytes());
+    //                     let token2_h160 = H160::from_slice(token2.as_bytes());
 
-                        let immutable_state_clone = immutable_state.clone();
-                        let mutable_state_clone = mutable_state.clone();
-                        tokio::spawn(async move {
-                            make_simple_routes(
-                                &token1_h160,
-                                &token2_h160,
-                                gas_price,
-                                exchange_index,
-                                &immutable_state_clone,
-                                &mutable_state_clone,
-                            )
-                            .await;
-                        });
+    //                     let immutable_state_clone = immutable_state.clone();
+    //                     let mutable_state_clone = mutable_state.clone();
+    //                     tokio::spawn(async move {
+    //                         make_simple_routes(
+    //                             &token1_h160,
+    //                             &token2_h160,
+    //                             gas_price,
+    //                             exchange_index,
+    //                             &immutable_state_clone,
+    //                             &mutable_state_clone,
+    //                         )
+    //                         .await;
+    //                     });
 
-                        let immutable_state_clone = immutable_state.clone();
-                        let mutable_state_clone = mutable_state.clone();
-                        tokio::spawn(async move {
-                            make_outer_tri_routes(
-                                &token1_h160,
-                                &token2_h160,
-                                gas_price,
-                                exchange_index,
-                                &immutable_state_clone,
-                                &mutable_state_clone,
-                            )
-                            .await;
-                        });
-                        // let simple_future = make_simple_routes(
-                        //     &token1_h160,
-                        //     &token2_h160,
-                        //     gas_price,
-                        //     exchange_index,
-                        //     immutable_state,
-                        //     mutable_state,
-                        // );
+    //                     let immutable_state_clone = immutable_state.clone();
+    //                     let mutable_state_clone = mutable_state.clone();
+    //                     tokio::spawn(async move {
+    //                         make_outer_tri_routes(
+    //                             &token1_h160,
+    //                             &token2_h160,
+    //                             gas_price,
+    //                             exchange_index,
+    //                             &immutable_state_clone,
+    //                             &mutable_state_clone,
+    //                         )
+    //                         .await;
+    //                     });
+    //                     // let simple_future = make_simple_routes(
+    //                     //     &token1_h160,
+    //                     //     &token2_h160,
+    //                     //     gas_price,
+    //                     //     exchange_index,
+    //                     //     immutable_state,
+    //                     //     mutable_state,
+    //                     // );
 
-                        // let tri_future = make_outer_tri_routes(
-                        //     &token1_h160,
-                        //     &token2_h160,
-                        //     gas_price,
-                        //     exchange_index,
-                        //     immutable_state,
-                        //     mutable_state,
-                        // );
-                        // futures::join!(tri_future, simple_future);
-                    } else {
-                        make_inner_tri_routes(
-                            &H160::from_slice(token1.as_bytes()),
-                            &H160::from_slice(token2.as_bytes()),
-                            gas_price,
-                            exchange_index,
-                            &immutable_state,
-                            &mutable_state,
-                        )
-                        .await;
-                    }
-                }
-                _ => {}
-            },
-            _ => {}
-        }
-    }
+    //                     // let tri_future = make_outer_tri_routes(
+    //                     //     &token1_h160,
+    //                     //     &token2_h160,
+    //                     //     gas_price,
+    //                     //     exchange_index,
+    //                     //     immutable_state,
+    //                     //     mutable_state,
+    //                     // );
+    //                     // futures::join!(tri_future, simple_future);
+    //                 } else {
+    //                     make_inner_tri_routes(
+    //                         &H160::from_slice(token1.as_bytes()),
+    //                         &H160::from_slice(token2.as_bytes()),
+    //                         gas_price,
+    //                         exchange_index,
+    //                         &immutable_state,
+    //                         &mutable_state,
+    //                     )
+    //                     .await;
+    //                 }
+    //             }
+    //             _ => {}
+    //         },
+    //         _ => {}
+        // }
+    // }
 }
 
 pub async fn process_uniswap_router_params(
+    hash: H256,
     function_headers: &Function,
     decoded_parameters: DecodedParams,
     tx_value: Web3U256,
@@ -115,6 +131,7 @@ pub async fn process_uniswap_router_params(
                     immutable_state,
                 ) {
                     process_token_path(
+                        hash,
                         token_path,
                         gas_price,
                         exchange_index,
@@ -140,6 +157,7 @@ pub async fn process_uniswap_router_params(
                     immutable_state,
                 ) {
                     process_token_path(
+                        hash,
                         token_path,
                         gas_price,
                         exchange_index,
@@ -165,6 +183,7 @@ pub async fn process_uniswap_router_params(
                     immutable_state,
                 ) {
                     process_token_path(
+                        hash,
                         token_path,
                         gas_price,
                         exchange_index,

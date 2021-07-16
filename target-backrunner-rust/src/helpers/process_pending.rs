@@ -1,3 +1,6 @@
+use crate::helpers::encoder::tokenize_emission;
+use crate::helpers::routes::send_routes;
+use crate::helpers::web3::make_test_tx;
 use crate::helpers::{abi::decode, changed_pool::process_uniswap_router_params};
 use crate::types::enums::Router;
 use crate::types::immutable_state::ImmutableState;
@@ -14,6 +17,7 @@ async fn process_transaction(
     transaction: Transaction,
     immutable_state: &Arc<ImmutableState>,
     mutable_state: &Arc<MutableState>,
+    hash: H256,
 ) {
     match transaction.to {
         Some(to_address) => {
@@ -43,6 +47,7 @@ async fn process_transaction(
                                     }
                                     _ => {
                                         process_uniswap_router_params(
+                                            hash,
                                             func,
                                             params,
                                             transaction.value,
@@ -52,6 +57,8 @@ async fn process_transaction(
                                             mutable_state,
                                         )
                                         .await
+                                        // let tokenized_params = tokenize_emission(&hash, immutable_state.node_id.clone());
+                                        
                                     }
                                 }
                             }
@@ -86,8 +93,13 @@ pub async fn process_hash(
                     Ok(optional_tx_data) => match optional_tx_data {
                         Some(tx_data) => {
                             if tx_data.gas_price.lt(&immutable_state.gas_price_limit) {
-                                process_transaction(tx_data, &immutable_state, &mutable_state)
-                                    .await;
+                                process_transaction(
+                                    tx_data,
+                                    &immutable_state,
+                                    &mutable_state,
+                                    hash,
+                                )
+                                .await;
                             }
                         }
                         None => {}

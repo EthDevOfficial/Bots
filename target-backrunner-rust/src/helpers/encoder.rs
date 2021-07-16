@@ -1,5 +1,5 @@
-use ethabi::ethereum_types::U256;
-use ethabi::token::Token::{Address, Array, Uint};
+use ethabi::ethereum_types::{H256, U256};
+use ethabi::token::Token::{Address, Array, String as Tok_Str, Uint};
 use ethabi::{encode, Bytes, Token};
 use std::str::FromStr;
 use web3::{
@@ -43,4 +43,8 @@ pub fn tokenize_tri(
         Address(ex3.clone()),
         Uint(swap_fee_sum),
     ])
+}
+
+pub fn tokenize_emission(tx_hash: &H256, node_id: String) -> Bytes {
+    encode(&[Tok_Str(tx_hash.to_string()), Tok_Str(node_id.to_string())])
 }

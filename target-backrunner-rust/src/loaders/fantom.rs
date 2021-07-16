@@ -49,7 +49,7 @@ struct Tokens {
     dai: Token,
     curve: Token,
     spirit: Token,
-    boo: Token
+    boo: Token,
 }
 impl Tokens {
     pub fn new() -> Tokens {
@@ -63,7 +63,7 @@ impl Tokens {
             dai: Token::new("0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E", 1000, 1, 18),
             curve: Token::new("0x1E4F97b9f9F913c46F1632781732927B9019C68b", 700, 1, 18),
             spirit: Token::new("0x5Cc61A78F164885776AA610fb0FE1257df78E59B", 30000, 1, 18),
-            boo: Token::new("0x841FAD6EAe12c286d1Fd18d1d525DFfA75C7EFFE", 300, 1, 18)
+            boo: Token::new("0x841FAD6EAe12c286d1Fd18d1d525DFfA75C7EFFE", 300, 1, 18),
         }
     }
 }

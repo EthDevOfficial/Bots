@@ -36,6 +36,7 @@ pub struct ImmutableState {
     pub simple_multicall: fn(Vec<Vec<u8>>) -> Vec<u8>,
     pub tri_multicall: fn(Vec<Vec<u8>>) -> Vec<u8>,
     pub gas_price_limit: U256,
+    pub node_id: String,
 }
 impl ImmutableState {
     pub async fn new(
@@ -48,7 +49,7 @@ impl ImmutableState {
         ignore_addresses: Vec<&str>,
     ) -> Self {
         // Web3
-        let ws_url = env::var("WS_URL").unwrap_or("ws://34.204.203.210:8546".to_string());
+        let ws_url = env::var("WS_URL").unwrap_or("ws://18.195.205.109:8546".to_string());
         let web3 = connect_to_node(&ws_url).await.unwrap();
 
         // let web3_infura = connect_to_node_http(
@@ -62,7 +63,7 @@ impl ImmutableState {
         // Contracts
         let contract = H160::from_str(
             &env::var("CONTRACT")
-                .unwrap_or("0x6E8a22e28A92f47CE1CE76a26dE691802A25ca85".to_string()),
+                .unwrap_or("0x62CCEDC01f956b5813F00334510a1932C720AD41".to_string()),
         )
         .unwrap();
 
@@ -85,14 +86,17 @@ impl ImmutableState {
 
         // Bidding
         let bundle_size: usize = env::var("BUNDLE_SIZE")
-            .unwrap_or("2".to_string())
+            .unwrap_or("1".to_string())
             .parse()
             .unwrap();
 
         let gas_limit: usize = env::var("GAS_LIMIT")
-            .unwrap_or("1200000".to_string())
+            .unwrap_or("100000".to_string())
             .parse()
             .unwrap();
+
+        let node_id = env::var("NODE_ID").unwrap_or("F".to_string());
+
         let mut exchanges: Vec<Exchange> = Vec::new();
 
         primary_exchanges
@@ -163,6 +167,7 @@ impl ImmutableState {
                 &env::var("GAS_PRICE_LIMIT").unwrap_or("500000000000".to_string()),
             )
             .unwrap(),
+            node_id,
         }
     }
 }

@@ -19,7 +19,7 @@ impl MutableState {
         // Wallets
         let wallet_path: String = env::var("WALLET_PATH").unwrap_or("./wallets.json".to_string());
         let gen_new_wallets: bool = env::var("GEN_NEW_WALLETS")
-            .unwrap_or("false".to_string())
+            .unwrap_or("true".to_string())
             .eq("true");
 
         let num_wallets: usize = env::var("NUM_WALLETS")
@@ -28,7 +28,7 @@ impl MutableState {
             .unwrap();
 
         let wallet_balance: U256 =
-            U256::from_dec_str(&env::var("WALLET_BALANCE").unwrap_or("100".to_string())).unwrap();
+            U256::from_dec_str(&env::var("WALLET_BALANCE").unwrap_or("10".to_string())).unwrap();
 
         let wl_gas_price: U256 =
             U256::from_dec_str(&env::var("WL_GAS_PRICE").unwrap_or("50".to_string())).unwrap();
