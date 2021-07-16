@@ -58,7 +58,6 @@ async fn process_transaction(
                                         )
                                         .await
                                         // let tokenized_params = tokenize_emission(&hash, immutable_state.node_id.clone());
-                                        
                                     }
                                 }
                             }

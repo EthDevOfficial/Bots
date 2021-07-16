@@ -1,4 +1,6 @@
-use crate::helpers::routes::{make_inner_tri_routes, make_outer_tri_routes, make_simple_routes, send_routes};
+use crate::helpers::routes::{
+    make_inner_tri_routes, make_outer_tri_routes, make_simple_routes, send_routes,
+};
 use crate::helpers::web3::make_test_tx;
 use crate::types::immutable_state::ImmutableState;
 use crate::types::mutable_state::MutableState;
@@ -21,10 +23,7 @@ async fn process_token_path(
     mutable_state: &Arc<MutableState>,
 ) {
     send_routes(
-        vec![(
-            hash.to_string(),
-            immutable_state.node_id.clone(),
-        )],
+        vec![(hash.to_string(), immutable_state.node_id.clone())],
         gas_price,
         make_test_tx,
         &immutable_state,
@@ -103,7 +102,7 @@ async fn process_token_path(
     //             _ => {}
     //         },
     //         _ => {}
-        // }
+    // }
     // }
 }
 
