@@ -68,15 +68,16 @@ impl Tokens {
 }
 
 struct Exchanges {
-    baoswap: Exchange,
+    // baoswap: Exchange,
+    sushiswap: Exchange,
     honeyswap: Exchange,
     swapper: Exchange,
 }
 impl Exchanges {
     pub fn new() -> Exchanges {
         Exchanges {
-            baoswap: Exchange::new(
-                "0x6093AeBAC87d62b1A5a4cEec91204e35020E38bE",
+            sushiswap: Exchange::new(
+                "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506",
                 30,
                 &Router::Uniswap,
             ),
