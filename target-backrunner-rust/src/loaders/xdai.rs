@@ -17,8 +17,8 @@ pub async fn load_immutable_state() -> Arc<ImmutableState> {
         tokens.agve,
     ];
 
-    let primary_exchanges = vec![exchanges.honeyswap];
-    let secondary_exchanges = vec![exchanges.swapper, exchanges.baoswap];
+    let primary_exchanges = vec![exchanges.honeyswap, exchanges.sushiswap];
+    let secondary_exchanges = vec![exchanges.swapper];
     let aggregators = vec![];
 
     let ignore_tokens = vec![
