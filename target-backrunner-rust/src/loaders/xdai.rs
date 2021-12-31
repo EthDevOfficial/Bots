@@ -48,6 +48,7 @@ struct Tokens {
     agve: Token,
     usdc: Token,
     stake: Token,
+    gno: Token
 }
 impl Tokens {
     pub fn new() -> Tokens {
@@ -63,6 +64,7 @@ impl Tokens {
             agve: Token::new("0x3a97704a1b25F08aa230ae53B352e2e72ef52843", 5, 10, 18), // .5
             usdc: Token::new("0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83", 100, 1, 6), // 100
             stake: Token::new("0xb7D311E2Eb55F2f68a9440da38e7989210b9A05e", 13, 1, 18), // 13
+            gno: Token::new("0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb", 1, 2, 18),
         }
     }
 }
